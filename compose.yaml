@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: 'postgres:16'
+    environment:
+      - 'POSTGRES_DB=barberya'
+      - 'POSTGRES_USER=barberya'
+      - 'POSTGRES_PASSWORD=barberya'
+    ports:
+      - '5432:5432'
