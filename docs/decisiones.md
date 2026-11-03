@@ -16,12 +16,16 @@ Registro de decisiones cerradas. Si algo cambia, se agrega una línea nueva con 
 - Flujo de reserva: servicio → barbero → horario. El barbero se saltea si hay uno solo.
 - El turno queda confirmado al reservar (no hay aprobación manual del barbero).
 - El cliente puede cancelar hasta X horas antes (regla configurable por barbería, por defecto 24 h).
+- 2026-11-03: en el login por código, el usuario se crea recién al validar el código; hasta entonces
+  el código se asocia al mail (`tokens_verificacion.usuario_id` es nullable).
 
 ## Turnos y plata
 - Al marcar un turno como completado se registra el cobro automáticamente, sin medio de pago.
   No se pregunta efectivo / Mercado Pago corte por corte.
 - Gastos: fijos (alquiler, luz, internet) y variables (insumos, herramientas).
 - Estadística clave del independiente: con cuántos cortes cubrió sus gastos fijos del mes.
+- 2026-11-03: los gastos fijos tienen su propia tabla (`gastos_fijos`). Un fijo está pendiente en un mes
+  si no tiene un gasto asociado en ese mes.
 
 ## Notificaciones
 - MVP: mail de confirmación y recordatorio + botón que abre WhatsApp con el mensaje armado (wa.me).
@@ -30,7 +34,10 @@ Registro de decisiones cerradas. Si algo cambia, se agrega una línea nueva con 
 ## Negocio
 - Suscripción mensual en pesos, cobrada con suscripciones de Mercado Pago (preapproval).
 - Precio inicial sugerido del plan Independiente: $9.900/mes, prueba gratis de 30 días.
-- Factura C electrónica automática por cada cobro (ARCA, WSFE).
+- Factura C electrónica automática por cada pago de la suscripción (ARCA, WSFE).
+- 2026-11-03: la factura C es la que BarberYA le emite al barbero por el pago de la suscripción, no por los
+  cobros de los cortes. No va en V1; queda para la fase de cobro.
+- 2026-11-03: el acceso lo decide la suscripción; `barberias.activa` es solo una suspensión manual del admin.
 
 ## Técnicas
 - Fechas en UTC; la app corre con `-Duser.timezone=UTC` (Windows manda el alias viejo
