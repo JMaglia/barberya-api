@@ -17,7 +17,7 @@ Decisiones de producto y su porqué: @docs/decisiones.md
   proveedores, productos.
 
 ## Stack
-- Java 21, Spring Boot 3, Maven
+- Java 21, Spring Boot 4, Maven
 - PostgreSQL 16 (Docker Compose en desarrollo)
 - Flyway (`src/main/resources/db/migration`), `spring.jpa.hibernate.ddl-auto=validate`
 - Spring Data JPA, Spring Security con JWT de acceso + refresh token en cookie httpOnly,
@@ -26,9 +26,10 @@ Decisiones de producto y su porqué: @docs/decisiones.md
 - springdoc-openapi (`/swagger-ui`)
 
 ## Comandos
-- Base local: `docker compose up -d db`
+- Base local: `docker compose up -d postgres`
 - App: `./mvnw spring-boot:run`
 - Tests: `./mvnw test` · uno solo: `./mvnw test -Dtest=NombreDelTest`
+- En Windows, reemplazar `./mvnw` por `.\mvnw.cmd` (o `.\mvnw` en PowerShell).
 
 ## Nombres e idioma
 - Dominio en español, igual que la base: tablas, columnas, entidades y campos
