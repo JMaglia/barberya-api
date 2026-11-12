@@ -8,4 +8,7 @@ public interface MiembroBarberiaRepository extends JpaRepository<MiembroBarberia
 
 	Optional<MiembroBarberia> findByIdAndBarberiaId(Long id, Long barberiaId);
 
+	/** En V1 un usuario es miembro de una sola barbería. */
+	Optional<MiembroBarberia> findFirstByUsuarioIdAndActivoTrue(Long usuarioId);
+
 }

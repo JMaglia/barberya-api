@@ -103,6 +103,7 @@ Toda persona que inicia sesión. Lo que puede hacer depende de su relación con 
 | `expira_en` | `TIMESTAMPTZ` | NN |
 | `revocado` | `BOOLEAN` | NN, def. `FALSE` |
 | `reemplazado_por` | `BIGINT` | FK → `refresh_tokens(id)`, `ON DELETE SET NULL` |
+| `mantener_sesion` | `BOOLEAN` | NN, def. `FALSE`. Si es `TRUE`, la cookie dura 30 días; si no, es de sesión (1 día en la base). Se copia al rotar |
 | `creado_en` | `TIMESTAMPTZ` | NN, def. `now()` |
 
 ### tokens_verificacion
