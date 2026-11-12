@@ -62,7 +62,7 @@ class MigracionV1Test {
 				"planes", "barberias", "suscripciones", "pagos_suscripcion",
 				"usuarios", "refresh_tokens", "tokens_verificacion", "miembros_barberia", "clientes",
 				"servicios", "horarios_atencion", "bloqueos_agenda", "turnos",
-				"cobros", "categorias_gasto", "gastos_fijos", "gastos");
+				"cobros", "categorias_gasto", "gastos_fijos", "proveedores", "gastos");
 
 		Integer btreeGist = jdbc.queryForObject(
 				"SELECT count(*) FROM pg_extension WHERE extname = 'btree_gist'", Integer.class);
@@ -130,6 +130,44 @@ class MigracionV1Test {
 	}
 
 	@Test
+	void borrarUnProveedorConGastosSeRechaza() {
+		Long barberiaId = crearBarberia("uno");
+		Long proveedorId = crearProveedor(barberiaId, "Navajin");
+		insertarGasto(barberiaId, null, proveedorId, 10);
+
+		assertRechazo(() -> jdbc.update("DELETE FROM proveedores WHERE id = ?", proveedorId),
+				FOREIGN_KEY_VIOLATION, "gastos_proveedor_id_barberia_id_fkey");
+	}
+
+	@Test
+	void borrarUnaCategoriaConGastosSeRechaza() {
+		Long barberiaId = crearBarberia("uno");
+		Long categoriaId = crearCategoria(barberiaId, "Insumos");
+		insertarGasto(barberiaId, categoriaId, null, null);
+
+		assertRechazo(() -> jdbc.update("DELETE FROM categorias_gasto WHERE id = ?", categoriaId),
+				FOREIGN_KEY_VIOLATION, "gastos_categoria_id_barberia_id_fkey");
+	}
+
+	@Test
+	void unGastoConProveedorDeOtraBarberiaSeRechaza() {
+		Long barberiaId = crearBarberia("uno");
+		Long otraId = crearBarberia("dos");
+		Long proveedorDeLaOtra = crearProveedor(otraId, "Navajin");
+
+		assertRechazo(() -> insertarGasto(barberiaId, null, proveedorDeLaOtra, 10),
+				FOREIGN_KEY_VIOLATION, "gastos_proveedor_id_barberia_id_fkey");
+	}
+
+	@Test
+	void unGastoConCantidadCeroSeRechaza() {
+		Long barberiaId = crearBarberia("uno");
+
+		assertRechazo(() -> insertarGasto(barberiaId, null, null, 0),
+				CHECK_VIOLATION, "gastos_cantidad_check");
+	}
+
+	@Test
 	void borrarUnaBarberiaEliminaTodasSusFilasYNoTocaLasDeOtra() {
 		Long planId = insertarDevolviendoId(
 				"INSERT INTO planes (nombre, precio_mensual, max_barberos) VALUES ('Independiente', 9900.00, 1) RETURNING id");
@@ -137,14 +175,14 @@ class MigracionV1Test {
 		Barberia otra = crearBarberiaConTodosSusDatos("dos", planId);
 		Map<String, Integer> filasAntes = contarFilasPorTabla(aBorrar.id());
 		Map<String, Integer> filasDeLaOtraAntes = contarFilasPorTabla(otra.id());
-		assertThat(filasAntes).hasSize(13).allSatisfy((tabla, filas) -> assertThat(filas).as(tabla).isEqualTo(1));
+		assertThat(filasAntes).hasSize(14).allSatisfy((tabla, filas) -> assertThat(filas).as(tabla).isEqualTo(1));
 		assertThat(filasDeLaOtraAntes).isEqualTo(filasAntes);
 
 		int borradas = jdbc.update("DELETE FROM barberias WHERE id = ?", aBorrar.id());
 
 		assertThat(borradas).isEqualTo(1);
 		assertThat(contarFilasPorTabla(aBorrar.id()))
-				.hasSize(13)
+				.hasSize(14)
 				.allSatisfy((tabla, filas) -> assertThat(filas).as(tabla).isZero());
 		assertThat(contarFilasPorTabla(otra.id())).isEqualTo(filasDeLaOtraAntes);
 		// El total por tabla descarta filas sueltas que los filtros por barbería no llegarían a ver.
@@ -222,16 +260,18 @@ class MigracionV1Test {
 				""", barberia.id(), barberia.miembroId(), barberia.clienteId(), barberia.servicioId(),
 				Timestamp.from(LAS_10), Timestamp.from(LAS_10_30));
 		jdbc.update("INSERT INTO cobros (barberia_id, turno_id, monto) VALUES (?, ?, 9900.00)", barberia.id(), turnoId);
-		Long categoriaId = insertarDevolviendoId(
-				"INSERT INTO categorias_gasto (barberia_id, nombre) VALUES (?, 'Local') RETURNING id", barberia.id());
+		Long categoriaId = crearCategoria(barberia.id(), "Local");
 		Long gastoFijoId = insertarDevolviendoId("""
 				INSERT INTO gastos_fijos (barberia_id, concepto, monto, dia_del_mes)
 				VALUES (?, 'Alquiler', 50000.00, 10) RETURNING id
 				""", barberia.id());
+		Long proveedorId = crearProveedor(barberia.id(), "Inmobiliaria");
 		jdbc.update("""
-				INSERT INTO gastos (barberia_id, categoria_id, gasto_fijo_id, descripcion, monto, fecha, es_fijo)
-				VALUES (?, ?, ?, 'Alquiler de noviembre', 50000.00, ?, TRUE)
-				""", barberia.id(), categoriaId, gastoFijoId, java.sql.Date.valueOf(LocalDate.of(2026, 11, 10)));
+				INSERT INTO gastos (barberia_id, categoria_id, gasto_fijo_id, proveedor_id, descripcion, cantidad,
+				                    monto, fecha, es_fijo)
+				VALUES (?, ?, ?, ?, 'Alquiler de noviembre', 1, 50000.00, ?, TRUE)
+				""", barberia.id(), categoriaId, gastoFijoId, proveedorId,
+				java.sql.Date.valueOf(LocalDate.of(2026, 11, 10)));
 		Long suscripcionId = insertarDevolviendoId("""
 				INSERT INTO suscripciones (barberia_id, plan_id, estado, fecha_inicio)
 				VALUES (?, ?, 'ACTIVA', ?) RETURNING id
@@ -243,11 +283,28 @@ class MigracionV1Test {
 		return barberia;
 	}
 
+	private Long crearProveedor(Long barberiaId, String nombre) {
+		return insertarDevolviendoId(
+				"INSERT INTO proveedores (barberia_id, nombre) VALUES (?, ?) RETURNING id", barberiaId, nombre);
+	}
+
+	private Long crearCategoria(Long barberiaId, String nombre) {
+		return insertarDevolviendoId(
+				"INSERT INTO categorias_gasto (barberia_id, nombre) VALUES (?, ?) RETURNING id", barberiaId, nombre);
+	}
+
+	private void insertarGasto(Long barberiaId, Long categoriaId, Long proveedorId, Integer cantidad) {
+		jdbc.update("""
+				INSERT INTO gastos (barberia_id, categoria_id, proveedor_id, descripcion, cantidad, monto, fecha)
+				VALUES (?, ?, ?, 'Navajas', ?, 15000.00, ?)
+				""", barberiaId, categoriaId, proveedorId, cantidad, java.sql.Date.valueOf(LocalDate.of(2026, 11, 12)));
+	}
+
 	private Map<String, Integer> contarFilasPorTabla(Long barberiaId) {
 		Map<String, Integer> filas = new HashMap<>();
 		filas.put("barberias", contar("SELECT count(*) FROM barberias WHERE id = ?", barberiaId));
 		List.of("suscripciones", "miembros_barberia", "clientes", "servicios", "turnos", "cobros",
-				"categorias_gasto", "gastos_fijos", "gastos")
+				"categorias_gasto", "gastos_fijos", "proveedores", "gastos")
 				.forEach(tabla -> filas.put(tabla,
 						contar("SELECT count(*) FROM " + tabla + " WHERE barberia_id = ?", barberiaId)));
 		filas.put("horarios_atencion", contar("""

@@ -26,6 +26,9 @@ Registro de decisiones cerradas. Si algo cambia, se agrega una línea nueva con 
 - Estadística clave del independiente: con cuántos cortes cubrió sus gastos fijos del mes.
 - 2026-11-03: los gastos fijos tienen su propia tabla (`gastos_fijos`). Un fijo está pendiente en un mes
   si no tiene un gasto asociado en ese mes.
+- 2026-11-12: los proveedores pasan a V1 para tener historial de compras por proveedor, sin tablas de productos
+  ni detalle de compra: el gasto guarda proveedor y cantidad (opcionales) y el precio unitario se calcula
+  (`monto / cantidad`). Proveedores y categorías con gastos no se borran; los proveedores tienen baja lógica.
 
 ## Notificaciones
 - MVP: mail de confirmación y recordatorio + botón que abre WhatsApp con el mensaje armado (wa.me).
