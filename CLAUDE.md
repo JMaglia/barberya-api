@@ -10,11 +10,11 @@ Decisiones de producto y su porqué: @docs/decisiones.md
 ## Alcance
 - **Versión 1 (MVP):** barbero independiente (barbero y dueño a la vez) y sus clientes.
   Login, barbería y link, servicios, horarios y bloqueos, reglas de reserva, horarios libres,
-  turnos, fichas de clientes, cobros automáticos, gastos fijos/variables, estadísticas,
+  turnos, fichas de clientes, cobros automáticos, gastos fijos/variables con proveedores, estadísticas,
   suscripción con Mercado Pago.
 - **Fuera de la v1 (no implementar aunque el modelo lo permita):** varios barberos por barbería,
   comisiones y pagos a barberos, invitaciones, recepcionista, señas, WhatsApp automático,
-  proveedores, productos.
+  productos.
 
 ## Stack
 - Java 21, Spring Boot 4, Maven

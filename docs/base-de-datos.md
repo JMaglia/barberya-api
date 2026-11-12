@@ -2,7 +2,7 @@
 
 Modelo de datos de BarberYA (PostgreSQL 16). Parte de `docs/Informacion_BD.pdf`; donde difieran, manda este archivo.
 
-**19 tablas:** 17 van en V1 y 2 quedan para v2 (ver [v2, no va en V1](#v2-no-va-en-v1)).
+**19 tablas:** 18 van en V1 y 1 (`barbero_servicios`) queda para v2 (ver [v2, no va en V1](#v2-no-va-en-v1)).
 
 ## Convenciones
 
@@ -273,15 +273,36 @@ Plantilla de un gasto mensual. Está pendiente en un mes si no tiene un gasto co
 
 `UNIQUE (id, barberia_id)`.
 
+### proveedores
+
+A quién se le compra. Permite ver el historial de compras por proveedor (qué se compró, cuánto y a qué precio), sin tablas de productos ni detalle de compra.
+
+Baja lógica: un proveedor inactivo no aparece al cargar gastos nuevos, pero los gastos viejos siguen apuntando a él. Un proveedor con gastos no se puede borrar.
+
+| Columna | Tipo | Restricciones |
+|---|---|---|
+| `id` | `BIGINT` | PK |
+| `barberia_id` | `BIGINT` | NN, FK → `barberias`, `ON DELETE CASCADE` |
+| `nombre` | `VARCHAR(120)` | NN |
+| `rubro` | `VARCHAR(80)` | |
+| `telefono` | `VARCHAR(30)` | |
+| `email` | `VARCHAR(255)` | |
+| `notas` | `TEXT` | |
+| `activo` | `BOOLEAN` | NN, def. `TRUE` |
+
+`UNIQUE (id, barberia_id)`.
+
 ### gastos
 
 | Columna | Tipo | Restricciones |
 |---|---|---|
 | `id` | `BIGINT` | PK |
 | `barberia_id` | `BIGINT` | NN, FK → `barberias`, `ON DELETE CASCADE` |
-| `categoria_id` | `BIGINT` | FK compuesta `(categoria_id, barberia_id)` → `categorias_gasto`, `ON DELETE SET NULL (categoria_id)` |
+| `categoria_id` | `BIGINT` | FK compuesta `(categoria_id, barberia_id)` → `categorias_gasto`. Una categoría con gastos no se puede borrar |
 | `gasto_fijo_id` | `BIGINT` | FK compuesta `(gasto_fijo_id, barberia_id)` → `gastos_fijos` |
-| `descripcion` | `VARCHAR(200)` | NN |
+| `proveedor_id` | `BIGINT` | FK compuesta `(proveedor_id, barberia_id)` → `proveedores` |
+| `descripcion` | `VARCHAR(200)` | NN. Qué se compró (ej.: "Navajas") |
+| `cantidad` | `INT` | `> 0`. El precio unitario se calcula en consultas (`monto / cantidad`); no se guarda |
 | `monto` | `NUMERIC(12,2)` | NN, `> 0` |
 | `fecha` | `DATE` | NN |
 | `metodo` | `VARCHAR(20)` | `CHECK` con los valores de arriba |
@@ -299,7 +320,8 @@ Plantilla de un gasto mensual. Está pendiente en un mes si no tiene un gasto co
 | Un barbero no tiene dos turnos superpuestos (los contiguos sí se permiten) | `turnos_sin_superposicion`; requiere la extensión `btree_gist` |
 | Turno, miembro, cliente y servicio son de la misma barbería | FK compuestas desde `turnos` |
 | Un cobro y su turno son de la misma barbería | FK compuesta desde `cobros` |
-| Un gasto, su categoría y su gasto fijo son de la misma barbería | FK compuestas desde `gastos` |
+| Un gasto, su categoría, su gasto fijo y su proveedor son de la misma barbería | FK compuestas desde `gastos` |
+| Una categoría o un proveedor con gastos no se puede borrar | FK desde `gastos` con `ON DELETE NO ACTION`; el borrado en cascada de la barbería sigue funcionando |
 | Una sola suscripción viva por barbería | `ux_suscripcion_viva` |
 | Un turno se cobra una sola vez | `cobros.turno_id` UQ |
 | Un pago de Mercado Pago no se registra dos veces | `pagos_suscripcion.referencia_externa` NN, UQ |
@@ -320,6 +342,7 @@ La base no impide estos casos:
 - **Cancelación:** respetar `cancelar_hasta_horas`.
 - **Revertir un turno completado:** borrar su cobro automático.
 - **Gastos fijos:** un solo gasto por fijo y mes.
+- **Proveedores:** baja lógica; al cargar un gasto nuevo solo se ofrecen los activos.
 - **Acceso:** lo decide la suscripción. `barberias.activa = false` es una suspensión manual del admin.
 - **Planes:** respetar `max_barberos`.
 - **Slugs:** reservar los que chocan con rutas de la web, como `api` o `login`.
@@ -332,22 +355,6 @@ La base no impide estos casos:
 No crear en la migración V1 ni implementar.
 
 - **Rol `RECEPCION`:** sumarlo al `CHECK` de `miembros_barberia.rol` con una migración.
-- **`gastos.proveedor_id`:** `BIGINT`, FK compuesta `(proveedor_id, barberia_id)` → `proveedores`, `ON DELETE SET NULL (proveedor_id)`.
-
-### proveedores (v2, no va en V1)
-
-| Columna | Tipo | Restricciones |
-|---|---|---|
-| `id` | `BIGINT` | PK |
-| `barberia_id` | `BIGINT` | NN, FK → `barberias`, `ON DELETE CASCADE` |
-| `nombre` | `VARCHAR(120)` | NN |
-| `rubro` | `VARCHAR(80)` | |
-| `telefono` | `VARCHAR(30)` | |
-| `email` | `VARCHAR(255)` | |
-| `notas` | `TEXT` | |
-| `activo` | `BOOLEAN` | NN, def. `TRUE` |
-
-`UNIQUE (id, barberia_id)`.
 
 ### barbero_servicios (v2, no va en V1)
 

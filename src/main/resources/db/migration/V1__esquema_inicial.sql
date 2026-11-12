@@ -230,22 +230,37 @@ CREATE TABLE gastos_fijos (
     UNIQUE (id, barberia_id)
 );
 
+CREATE TABLE proveedores (
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    barberia_id BIGINT       NOT NULL REFERENCES barberias (id) ON DELETE CASCADE,
+    nombre      VARCHAR(120) NOT NULL,
+    rubro       VARCHAR(80),
+    telefono    VARCHAR(30),
+    email       VARCHAR(255),
+    notas       TEXT,
+    activo      BOOLEAN      NOT NULL DEFAULT TRUE,
+    UNIQUE (id, barberia_id)
+);
+
 CREATE TABLE gastos (
     id              BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     barberia_id     BIGINT        NOT NULL REFERENCES barberias (id) ON DELETE CASCADE,
     categoria_id    BIGINT,
     gasto_fijo_id   BIGINT,
+    proveedor_id    BIGINT,
     descripcion     VARCHAR(200)  NOT NULL,
-    monto           NUMERIC(12,2) NOT NULL CHECK (monto > 0),
+    cantidad        INT           CHECK (cantidad > 0),
+    monto         NUMERIC(12,2) NOT NULL CHECK (monto > 0),
     fecha           DATE          NOT NULL,
     metodo          VARCHAR(20)   CHECK (metodo IN ('EFECTIVO', 'TRANSFERENCIA', 'MERCADO_PAGO', 'TARJETA', 'OTRO')),
     comprobante_url TEXT,
     es_fijo         BOOLEAN       NOT NULL DEFAULT FALSE,
     creado_en       TIMESTAMPTZ   NOT NULL DEFAULT now(),
-    -- SET NULL solo sobre categoria_id: barberia_id es NOT NULL y tiene que quedar intacto.
-    FOREIGN KEY (categoria_id, barberia_id) REFERENCES categorias_gasto (id, barberia_id)
-        ON DELETE SET NULL (categoria_id),
+    -- NO ACTION (no RESTRICT): se chequea al final de la sentencia, así el borrado en cascada
+    -- de una barbería puede llevarse gastos, categorías y proveedores juntos.
+    FOREIGN KEY (categoria_id, barberia_id) REFERENCES categorias_gasto (id, barberia_id),
     FOREIGN KEY (gasto_fijo_id, barberia_id) REFERENCES gastos_fijos (id, barberia_id),
+    FOREIGN KEY (proveedor_id, barberia_id) REFERENCES proveedores (id, barberia_id),
     CHECK (gasto_fijo_id IS NULL OR es_fijo)
 );
 
