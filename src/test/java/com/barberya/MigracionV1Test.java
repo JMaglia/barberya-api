@@ -11,22 +11,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.postgresql.util.PSQLException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Verifica contra un Postgres real que la migración V1 aplica y que la base hace cumplir sus reglas.
- * Sin {@code @Transactional}: en Postgres un error aborta la transacción, así que cada test limpia antes de correr.
+ * Sin {@code @Transactional}: en Postgres un error aborta la transacción, así que la base se limpia
+ * antes y después de cada test (ver {@link IntegracionConLimpiezaTest}).
  */
-@Import(TestcontainersConfiguration.class)
-@SpringBootTest
-class MigracionV1Test {
+class MigracionV1Test extends IntegracionConLimpiezaTest {
 
 	private static final String EXCLUSION_VIOLATION = "23P01";
 	private static final String FOREIGN_KEY_VIOLATION = "23503";
@@ -38,14 +32,6 @@ class MigracionV1Test {
 	private static final Instant LAS_10_30 = Instant.parse("2026-12-01T13:30:00Z");
 	private static final Instant LAS_10_45 = Instant.parse("2026-12-01T13:45:00Z");
 	private static final Instant LAS_11 = Instant.parse("2026-12-01T14:00:00Z");
-
-	@Autowired
-	private JdbcTemplate jdbc;
-
-	@BeforeEach
-	void limpiarBase() {
-		jdbc.execute("TRUNCATE barberias, usuarios, planes RESTART IDENTITY CASCADE");
-	}
 
 	@Test
 	void laMigracionAplicaYCreaLasTablasDeV1() {
