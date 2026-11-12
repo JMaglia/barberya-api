@@ -78,6 +78,7 @@ Decisiones de producto y su porqué: @docs/decisiones.md
 - Cambios enfocados en lo pedido; no refactorizar ni agregar cosas fuera del alcance.
 - Cada cambio de base = migración Flyway nueva (`V2__...`). Nunca editar una ya aplicada.
 - Cada endpoint: test de integración del caso feliz, de validación y de aislamiento entre barberías.
+- Tests de integración: o son @Transactional (se revierten solos) o limpian la base antes y después de cada test. Nunca dejar datos commiteados en el contenedor compartido.
 - Correr `./mvnw test` antes de dar algo por terminado.
 - Git: una rama por funcionalidad (`feat/reservar-turno`), PR a `main`, lo revisa el otro.
   Commits cortos: `feat: reservar turno`, `fix: ...`, `test: ...`.
