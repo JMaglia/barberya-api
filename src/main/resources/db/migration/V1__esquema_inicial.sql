@@ -82,6 +82,7 @@ CREATE TABLE refresh_tokens (
     expira_en       TIMESTAMPTZ  NOT NULL,
     revocado        BOOLEAN      NOT NULL DEFAULT FALSE,
     reemplazado_por BIGINT       REFERENCES refresh_tokens (id) ON DELETE SET NULL,
+    mantener_sesion BOOLEAN      NOT NULL DEFAULT FALSE,
     creado_en       TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 

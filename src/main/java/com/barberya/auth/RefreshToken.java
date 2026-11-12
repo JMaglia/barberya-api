@@ -55,14 +55,19 @@ public class RefreshToken {
 	@JoinColumn(name = "reemplazado_por")
 	private RefreshToken reemplazadoPor;
 
+	/** Cookie de 30 días (true) o de sesión (false). Se copia al rotar. */
+	@Column(name = "mantener_sesion", nullable = false)
+	private boolean mantenerSesion = false;
+
 	@Generated(event = EventType.INSERT)
 	@Column(name = "creado_en", nullable = false, insertable = false, updatable = false)
 	private Instant creadoEn;
 
-	public RefreshToken(Usuario usuario, String tokenHash, Instant expiraEn) {
+	public RefreshToken(Usuario usuario, String tokenHash, Instant expiraEn, boolean mantenerSesion) {
 		this.usuario = usuario;
 		this.tokenHash = tokenHash;
 		this.expiraEn = expiraEn;
+		this.mantenerSesion = mantenerSesion;
 	}
 
 	@Override

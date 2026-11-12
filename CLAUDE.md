@@ -76,7 +76,8 @@ Decisiones de producto y su porqué: @docs/decisiones.md
 ## Forma de trabajar
 - Para cambios que tocan varios archivos o la base: proponer un plan y esperar el OK.
 - Cambios enfocados en lo pedido; no refactorizar ni agregar cosas fuera del alcance.
-- Cada cambio de base = migración Flyway nueva (`V2__...`). Nunca editar una ya aplicada.
+- Hasta el primer deploy del piloto se puede editar `V1__esquema_inicial.sql` (y recrear la base local
+  con `docker compose down -v`). Después del deploy, nunca: cada cambio es una migración nueva.
 - Cada endpoint: test de integración del caso feliz, de validación y de aislamiento entre barberías.
 - Tests de integración: o son @Transactional (se revierten solos) o limpian la base antes y después de cada test. Nunca dejar datos commiteados en el contenedor compartido.
 - Correr `./mvnw test` antes de dar algo por terminado.
