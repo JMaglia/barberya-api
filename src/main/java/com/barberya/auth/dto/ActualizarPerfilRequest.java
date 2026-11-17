@@ -1,5 +1,7 @@
 package com.barberya.auth.dto;
 
+import com.barberya.validacion.Telefono;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -14,8 +16,7 @@ public record ActualizarPerfilRequest(
 		String apellido,
 
 		@NotBlank(message = "Ingresá tu celular")
-		// Acepta el vacío para que ese caso lo reporte solo @NotBlank, con su mensaje.
-		@Pattern(regexp = "^$|^\\+?[0-9 ()-]{8,29}$", message = "El celular no es válido")
+		@Pattern(regexp = Telefono.REGEX, message = Telefono.MENSAJE)
 		String telefono) {
 
 	@Override

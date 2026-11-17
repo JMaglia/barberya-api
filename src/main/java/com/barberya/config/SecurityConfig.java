@@ -63,6 +63,8 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/api/v1/auth/**", "/api/v1/public/**").permitAll()
 						.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+						// La barbería del token y sus datos: solo el dueño. POST /barberias (onboarding) no exige rol.
+						.requestMatchers("/api/v1/barberia/**", "/api/v1/servicios/**").hasRole("DUENO")
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(o -> o
 						.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
