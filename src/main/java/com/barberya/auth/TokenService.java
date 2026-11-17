@@ -60,6 +60,11 @@ public class TokenService {
 		return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
 	}
 
+	/** Código de 6 dígitos para el login por mail. */
+	public String nuevoCodigo() {
+		return "%06d".formatted(random.nextInt(1_000_000));
+	}
+
 	/** En la base se guarda solo este hash, nunca el valor. */
 	public static String sha256(String valor) {
 		try {

@@ -5,4 +5,6 @@ public interface EnvioMails {
 
 	void enviarRecuperacionClave(String email, String link);
 
+	void enviarCodigo(String email, String codigo);
+
 }

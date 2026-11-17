@@ -6,11 +6,24 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /** Configuración propia de la app ({@code barberya.*}). */
 @ConfigurationProperties(prefix = "barberya")
-public record BarberyaProperties(Jwt jwt, String frontUrl) {
+public record BarberyaProperties(Jwt jwt, String frontUrl, Google google) {
 
 	public BarberyaProperties {
 		if (frontUrl == null || frontUrl.isBlank()) {
 			throw new IllegalStateException("Falta barberya.front-url (variable FRONT_URL)");
+		}
+		if (google == null) {
+			throw new IllegalStateException("Falta barberya.google.client-id (variable GOOGLE_CLIENT_ID)");
+		}
+	}
+
+	/** {@code clientId}: el aud que tienen que traer los ID tokens de Google. */
+	public record Google(String clientId) {
+
+		public Google {
+			if (clientId == null || clientId.isBlank()) {
+				throw new IllegalStateException("Falta barberya.google.client-id (variable GOOGLE_CLIENT_ID)");
+			}
 		}
 	}
 
