@@ -9,7 +9,10 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -22,6 +25,10 @@ import com.barberya.auth.GoogleInvalidoException;
 import com.barberya.auth.RefreshCookie;
 import com.barberya.auth.SesionInvalidaException;
 import com.barberya.auth.TokenRecuperacionInvalidoException;
+import com.barberya.auth.UsuarioActual;
+import com.barberya.barberia.SlugNoDisponibleException;
+import com.barberya.barberia.YaTieneBarberiaException;
+import com.barberya.servicio.ServicioDuplicadoException;
 
 /** Errores en formato ProblemDetail (RFC 7807), con mensaje en español. */
 @RestControllerAdvice
@@ -92,9 +99,34 @@ public class ManejadorErrores {
 		return problema(HttpStatus.UNAUTHORIZED, "No autorizado", "Tenés que iniciar sesión");
 	}
 
+	/** Un usuario logueado que todavía no es miembro de ninguna barbería recibe un mensaje que le dice qué hacer. */
 	@ExceptionHandler(AccessDeniedException.class)
 	ProblemDetail sinPermiso(AccessDeniedException error) {
+		Authentication autenticacion = SecurityContextHolder.getContext().getAuthentication();
+		if (autenticacion instanceof JwtAuthenticationToken jwt && !UsuarioActual.tieneBarberia(jwt.getToken())) {
+			return problema(HttpStatus.FORBIDDEN, "Sin barbería", "Primero creá tu barbería");
+		}
 		return problema(HttpStatus.FORBIDDEN, "Sin permiso", "No tenés permiso para hacer esto");
+	}
+
+	@ExceptionHandler(RecursoNoEncontradoException.class)
+	ProblemDetail noEncontrado(RecursoNoEncontradoException error) {
+		return problema(HttpStatus.NOT_FOUND, "No encontrado", error.getMessage());
+	}
+
+	@ExceptionHandler(YaTieneBarberiaException.class)
+	ProblemDetail yaTieneBarberia(YaTieneBarberiaException error) {
+		return problema(HttpStatus.CONFLICT, "Ya tenés una barbería", error.getMessage());
+	}
+
+	@ExceptionHandler(SlugNoDisponibleException.class)
+	ProblemDetail slugNoDisponible(SlugNoDisponibleException error) {
+		return problema(HttpStatus.CONFLICT, "Link no disponible", error.getMessage());
+	}
+
+	@ExceptionHandler(ServicioDuplicadoException.class)
+	ProblemDetail servicioDuplicado(ServicioDuplicadoException error) {
+		return problema(HttpStatus.CONFLICT, "Servicio repetido", error.getMessage());
 	}
 
 	private static ProblemDetail problema(HttpStatus estado, String titulo, String detalle) {
