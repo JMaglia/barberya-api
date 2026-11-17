@@ -52,9 +52,9 @@ public class Usuario {
 	@Column(name = "es_admin", nullable = false)
 	private boolean esAdmin = false;
 
-	@NotBlank
+	/** NULL si entró por código y todavía no completó el perfil. */
 	@Size(max = 80)
-	@Column(nullable = false, length = 80)
+	@Column(length = 80)
 	private String nombre;
 
 	@Size(max = 80)

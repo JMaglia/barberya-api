@@ -69,7 +69,7 @@ CREATE TABLE usuarios (
     google_sub       VARCHAR(255) UNIQUE,
     email_verificado BOOLEAN      NOT NULL DEFAULT FALSE,
     es_admin         BOOLEAN      NOT NULL DEFAULT FALSE,
-    nombre           VARCHAR(80)  NOT NULL,
+    nombre           VARCHAR(80),
     apellido         VARCHAR(80),
     telefono         VARCHAR(30),
     creado_en        TIMESTAMPTZ  NOT NULL DEFAULT now()

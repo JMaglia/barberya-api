@@ -10,16 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -38,6 +33,7 @@ import jakarta.servlet.http.Cookie;
  * refresh se commitea aunque la respuesta sea 401, y eso hay que verlo en la base.
  */
 @AutoConfigureMockMvc
+@Import(AuthFalsosConfig.class)
 class AuthIntegracionTest extends IntegracionConLimpiezaTest {
 
 	private static final String PASSWORD = "clave-segura-1";
@@ -48,11 +44,11 @@ class AuthIntegracionTest extends IntegracionConLimpiezaTest {
 	@Autowired
 	private JwtDecoder jwtDecoder;
 	@Autowired
-	private EnvioMailsFalso envioMails;
+	private AuthFalsosConfig.EnvioMailsFalso envioMails;
 
 	@BeforeEach
 	void limpiarMails() {
-		envioMails.links.clear();
+		envioMails.limpiar();
 	}
 
 	// --- Registro ---
@@ -192,6 +188,7 @@ class AuthIntegracionTest extends IntegracionConLimpiezaTest {
 				.andExpect(jsonPath("$.email").value("juan@mail.com"))
 				.andExpect(jsonPath("$.telefono").value("1122334455"))
 				.andExpect(jsonPath("$.emailVerificado").value(false))
+				.andExpect(jsonPath("$.perfilCompleto").value(true))
 				.andExpect(jsonPath("$.barberiaId").isEmpty())
 				.andExpect(jsonPath("$.rol").isEmpty());
 
@@ -441,27 +438,6 @@ class AuthIntegracionTest extends IntegracionConLimpiezaTest {
 		jdbc.update("INSERT INTO miembros_barberia (barberia_id, usuario_id, rol) VALUES (?, ?, 'DUENO')",
 				barberiaId, usuarioId);
 		return barberiaId;
-	}
-
-	/** Guarda los links en vez de mandar mails, para que el test pueda usar el token. */
-	static class EnvioMailsFalso implements EnvioMails {
-
-		final List<String> links = new ArrayList<>();
-
-		@Override
-		public void enviarRecuperacionClave(String email, String link) {
-			links.add(link);
-		}
-	}
-
-	@TestConfiguration
-	static class Config {
-
-		@Bean
-		@Primary
-		EnvioMailsFalso envioMailsFalso() {
-			return new EnvioMailsFalso();
-		}
 	}
 
 }

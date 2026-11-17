@@ -88,7 +88,7 @@ Toda persona que inicia sesión. Lo que puede hacer depende de su relación con 
 | `google_sub` | `VARCHAR(255)` | UQ |
 | `email_verificado` | `BOOLEAN` | NN, def. `FALSE` |
 | `es_admin` | `BOOLEAN` | NN, def. `FALSE`. Admin de la plataforma |
-| `nombre` | `VARCHAR(80)` | NN |
+| `nombre` | `VARCHAR(80)` | NULL si entró por código y todavía no completó el perfil. Se pide junto con el celular antes de la primera reserva |
 | `apellido` | `VARCHAR(80)` | |
 | `telefono` | `VARCHAR(30)` | |
 | `creado_en` | `TIMESTAMPTZ` | NN, def. `now()` |

@@ -3,10 +3,15 @@ package com.barberya.auth;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.barberya.auth.dto.ActualizarPerfilRequest;
 import com.barberya.auth.dto.MeResponse;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/me")
@@ -22,6 +27,12 @@ public class MeController {
 	@GetMapping
 	public MeResponse me(@AuthenticationPrincipal Jwt jwt) {
 		return authService.me(Long.valueOf(jwt.getSubject()));
+	}
+
+	/** Completa el perfil (nombre y celular). El usuario sale del token. */
+	@PatchMapping
+	public MeResponse actualizar(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody ActualizarPerfilRequest request) {
+		return authService.actualizarPerfil(Long.valueOf(jwt.getSubject()), request);
 	}
 
 }

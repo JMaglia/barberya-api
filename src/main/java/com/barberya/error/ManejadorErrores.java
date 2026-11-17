@@ -14,8 +14,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.barberya.auth.CodigoInvalidoException;
 import com.barberya.auth.CredencialesInvalidasException;
+import com.barberya.auth.CuentaDuplicadaException;
 import com.barberya.auth.EmailYaRegistradoException;
+import com.barberya.auth.GoogleInvalidoException;
 import com.barberya.auth.RefreshCookie;
 import com.barberya.auth.SesionInvalidaException;
 import com.barberya.auth.TokenRecuperacionInvalidoException;
@@ -61,6 +64,21 @@ public class ManejadorErrores {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 				.header(HttpHeaders.SET_COOKIE, refreshCookie.borrar().toString())
 				.body(problema(HttpStatus.UNAUTHORIZED, "Sesión vencida", error.getMessage()));
+	}
+
+	@ExceptionHandler(CuentaDuplicadaException.class)
+	ProblemDetail cuentaDuplicada(CuentaDuplicadaException error) {
+		return problema(HttpStatus.CONFLICT, "Mail ya registrado", error.getMessage());
+	}
+
+	@ExceptionHandler(GoogleInvalidoException.class)
+	ProblemDetail googleInvalido(GoogleInvalidoException error) {
+		return problema(HttpStatus.UNAUTHORIZED, "No autorizado", error.getMessage());
+	}
+
+	@ExceptionHandler(CodigoInvalidoException.class)
+	ProblemDetail codigoInvalido(CodigoInvalidoException error) {
+		return problema(HttpStatus.UNAUTHORIZED, "No autorizado", error.getMessage());
 	}
 
 	@ExceptionHandler(TokenRecuperacionInvalidoException.class)

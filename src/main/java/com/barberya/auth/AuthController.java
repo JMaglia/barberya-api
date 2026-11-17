@@ -10,13 +10,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.barberya.auth.dto.GoogleLoginRequest;
 import com.barberya.auth.dto.LoginRequest;
 import com.barberya.auth.dto.MensajeResponse;
 import com.barberya.auth.dto.RecuperarRequest;
 import com.barberya.auth.dto.RegistroRequest;
 import com.barberya.auth.dto.RestablecerRequest;
+import com.barberya.auth.dto.SolicitarCodigoRequest;
 import com.barberya.auth.dto.TokenResponse;
 import com.barberya.auth.dto.UsuarioResponse;
+import com.barberya.auth.dto.VerificarCodigoRequest;
 
 import jakarta.validation.Valid;
 
@@ -41,6 +44,23 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
 		return conCookie(authService.login(request));
+	}
+
+	@PostMapping("/google")
+	public ResponseEntity<TokenResponse> google(@Valid @RequestBody GoogleLoginRequest request) {
+		return conCookie(authService.loginGoogle(request));
+	}
+
+	/** Responde siempre 200 con el mismo mensaje, tenga cuenta o no el mail. */
+	@PostMapping("/codigo/solicitar")
+	public MensajeResponse solicitarCodigo(@Valid @RequestBody SolicitarCodigoRequest request) {
+		authService.solicitarCodigo(request.email());
+		return new MensajeResponse("Si el mail es válido, te enviamos un código para entrar");
+	}
+
+	@PostMapping("/codigo/verificar")
+	public ResponseEntity<TokenResponse> verificarCodigo(@Valid @RequestBody VerificarCodigoRequest request) {
+		return conCookie(authService.verificarCodigo(request));
 	}
 
 	@PostMapping("/refresh")

@@ -18,6 +18,10 @@ Registro de decisiones cerradas. Si algo cambia, se agrega una línea nueva con 
 - El cliente puede cancelar hasta X horas antes (regla configurable por barbería, por defecto 24 h).
 - 2026-11-03: en el login por código, el usuario se crea recién al validar el código; hasta entonces
   el código se asocia al mail (`tokens_verificacion.usuario_id` es nullable).
+- 2026-11-17: `usuarios.nombre` pasa a nullable: quien entra por código no tiene nombre hasta completar el perfil.
+  El front pide nombre y celular (`PATCH /me`, `perfilCompleto`) antes de dejar reservar.
+- 2026-11-17: al entrar con Google o con código en una cuenta con el mail sin verificar, se borra su contraseña y se
+  cierran sus sesiones, para que nadie pueda registrar un mail ajeno y seguir entrando cuando el dueño real lo usa.
 
 ## Turnos y plata
 - Al marcar un turno como completado se registra el cobro automáticamente, sin medio de pago.
