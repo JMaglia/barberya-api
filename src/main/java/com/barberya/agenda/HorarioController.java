@@ -14,9 +14,11 @@ import com.barberya.agenda.dto.FranjaHorariaRequest;
 import com.barberya.agenda.dto.FranjaHorariaResponse;
 import com.barberya.barberia.MiembroActual;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 /** Horario semanal del miembro actual. Los permisos por rol están en SecurityConfig. */
+@Tag(name = "Horarios", description = "Horario semanal de atención")
 @RestController
 @RequestMapping("/api/v1/horarios")
 public class HorarioController {

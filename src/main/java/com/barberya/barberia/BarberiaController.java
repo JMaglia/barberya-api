@@ -17,9 +17,11 @@ import com.barberya.barberia.dto.BarberiaCreadaResponse;
 import com.barberya.barberia.dto.BarberiaResponse;
 import com.barberya.barberia.dto.CrearBarberiaRequest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 /** {@code /barberia} (singular) es siempre la del token; los permisos por rol están en SecurityConfig. */
+@Tag(name = "Barbería", description = "Alta y datos de la barbería del token")
 @RestController
 @RequestMapping("/api/v1")
 public class BarberiaController {

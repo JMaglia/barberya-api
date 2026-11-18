@@ -21,9 +21,11 @@ import com.barberya.servicio.dto.ActualizarServicioRequest;
 import com.barberya.servicio.dto.CrearServicioRequest;
 import com.barberya.servicio.dto.ServicioResponse;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 /** Servicios de la barbería del token. Los permisos por rol están en SecurityConfig. */
+@Tag(name = "Servicios", description = "ABM de los servicios de la barbería")
 @RestController
 @RequestMapping("/api/v1/servicios")
 public class ServicioController {
