@@ -24,9 +24,11 @@ import com.barberya.agenda.dto.CrearBloqueoRequest;
 import com.barberya.auth.UsuarioActual;
 import com.barberya.barberia.MiembroActual;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 /** Bloqueos de agenda del miembro actual. Los permisos por rol están en SecurityConfig. */
+@Tag(name = "Bloqueos", description = "Bloqueos de agenda: vacaciones, francos")
 @RestController
 @RequestMapping("/api/v1/bloqueos")
 public class BloqueoController {

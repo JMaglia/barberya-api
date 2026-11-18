@@ -21,8 +21,10 @@ import com.barberya.auth.dto.TokenResponse;
 import com.barberya.auth.dto.UsuarioResponse;
 import com.barberya.auth.dto.VerificarCodigoRequest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+@Tag(name = "Auth", description = "Registro, login (mail, Google, código), refresh, logout y recuperar clave")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {

@@ -18,7 +18,10 @@ import com.barberya.disponibilidad.dto.DisponibilidadResponse;
 import com.barberya.servicio.ServicioService;
 import com.barberya.servicio.dto.ServicioPublicoResponse;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /** Sin login: lo que ve el cliente desde el link de la barbería. Barbería inexistente o suspendida → 404. */
+@Tag(name = "Público", description = "Datos de una barbería por slug, sin login")
 @RestController
 @RequestMapping("/api/v1/public/barberias/{slug}")
 public class BarberiaPublicaController {

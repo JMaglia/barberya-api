@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.barberya.auth.dto.ActualizarPerfilRequest;
 import com.barberya.auth.dto.MeResponse;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+@Tag(name = "Me", description = "Perfil del usuario logueado")
 @RestController
 @RequestMapping("/api/v1/me")
 public class MeController {
