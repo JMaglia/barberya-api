@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,12 +77,22 @@ public abstract class ApiIntegracionTest extends IntegracionConLimpiezaTest {
 		return mvc.perform(conToken(patch(url), token).contentType(MediaType.APPLICATION_JSON).content(json));
 	}
 
+	protected ResultActions putCon(String token, String url, String json) throws Exception {
+		return mvc.perform(conToken(put(url), token).contentType(MediaType.APPLICATION_JSON).content(json));
+	}
+
 	protected ResultActions deleteCon(String token, String url) throws Exception {
 		return mvc.perform(conToken(delete(url), token));
 	}
 
 	protected Long barberiaIdDeSlug(String slug) {
 		return jdbc.queryForObject("SELECT id FROM barberias WHERE slug = ?", Long.class, slug);
+	}
+
+	protected Long miembroIdDeSlug(String slug) {
+		return jdbc.queryForObject("""
+				SELECT m.id FROM miembros_barberia m JOIN barberias b ON b.id = m.barberia_id WHERE b.slug = ?
+				""", Long.class, slug);
 	}
 
 	private static MockHttpServletRequestBuilder conToken(MockHttpServletRequestBuilder request, String token) {

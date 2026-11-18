@@ -61,11 +61,40 @@ class BarberiaPublicaIntegracionTest extends ApiIntegracionTest {
 	}
 
 	@Test
+	void horariosSinTokenOrdenadosYSinDatosInternos() throws Exception {
+		String token = duenoConBarberia("a@mail.com", "Lo de Juan");
+		putCon(token, "/api/v1/horarios", """
+				[{"diaSemana":2,"horaInicio":"14:00","horaFin":"20:00"},
+				 {"diaSemana":2,"horaInicio":"09:00","horaFin":"13:00"},
+				 {"diaSemana":0,"horaInicio":"10:00","horaFin":"13:00"}]
+				""").andExpect(status().isOk());
+		String inicio = java.time.LocalDate.now().plusDays(5) + "T10:00:00-03:00";
+		String fin = java.time.LocalDate.now().plusDays(5) + "T12:00:00-03:00";
+		postCon(token, "/api/v1/bloqueos", "{\"inicio\":\"%s\",\"fin\":\"%s\",\"motivo\":\"Privado\"}".formatted(inicio, fin))
+				.andExpect(status().isCreated());
+		// Los de otra barbería no aparecen.
+		String otra = duenoConBarberia("b@mail.com", "Otra");
+		putCon(otra, "/api/v1/horarios", "[{\"diaSemana\":3,\"horaInicio\":\"08:00\",\"horaFin\":\"12:00\"}]")
+				.andExpect(status().isOk());
+
+		mvc.perform(get(URL + "lo-de-juan/horarios"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[*].diaSemana", contains(0, 2, 2)))
+				.andExpect(jsonPath("$[*].horaInicio", contains("10:00", "09:00", "14:00")))
+				.andExpect(jsonPath("$[*].horaFin", contains("13:00", "13:00", "20:00")))
+				.andExpect(jsonPath("$[0].id").doesNotExist())
+				.andExpect(jsonPath("$[0].miembroId").doesNotExist())
+				.andExpect(jsonPath("$[0].motivo").doesNotExist())
+				.andExpect(jsonPath("$..inicio").isEmpty());
+	}
+
+	@Test
 	void slugInexistenteOBarberiaSuspendidaDa404() throws Exception {
 		duenoConBarberia("a@mail.com", "Lo de Juan");
 		jdbc.update("UPDATE barberias SET activa = FALSE WHERE slug = 'lo-de-juan'");
 
-		for (String url : new String[] { "no-existe", "no-existe/servicios", "lo-de-juan", "lo-de-juan/servicios" }) {
+		for (String url : new String[] { "no-existe", "no-existe/servicios", "no-existe/horarios", "lo-de-juan",
+				"lo-de-juan/servicios", "lo-de-juan/horarios" }) {
 			mvc.perform(get(URL + url))
 					.andExpect(status().isNotFound())
 					.andExpect(jsonPath("$.detail").value("No encontramos esa barbería"));

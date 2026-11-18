@@ -13,4 +13,6 @@ public interface MiembroBarberiaRepository extends JpaRepository<MiembroBarberia
 
 	boolean existsByUsuarioId(Long usuarioId);
 
+	Optional<MiembroBarberia> findByUsuarioIdAndBarberiaIdAndActivoTrue(Long usuarioId, Long barberiaId);
+
 }

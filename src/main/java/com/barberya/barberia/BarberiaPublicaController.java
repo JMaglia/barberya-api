@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.barberya.agenda.HorarioService;
+import com.barberya.agenda.dto.FranjaHorariaResponse;
 import com.barberya.barberia.dto.BarberiaPublicaResponse;
 import com.barberya.servicio.ServicioService;
 import com.barberya.servicio.dto.ServicioPublicoResponse;
@@ -18,10 +20,13 @@ public class BarberiaPublicaController {
 
 	private final BarberiaService barberiaService;
 	private final ServicioService servicioService;
+	private final HorarioService horarioService;
 
-	public BarberiaPublicaController(BarberiaService barberiaService, ServicioService servicioService) {
+	public BarberiaPublicaController(BarberiaService barberiaService, ServicioService servicioService,
+			HorarioService horarioService) {
 		this.barberiaService = barberiaService;
 		this.servicioService = servicioService;
+		this.horarioService = horarioService;
 	}
 
 	@GetMapping
@@ -32,6 +37,12 @@ public class BarberiaPublicaController {
 	@GetMapping("/servicios")
 	public List<ServicioPublicoResponse> servicios(@PathVariable String slug) {
 		return servicioService.listarPublicos(slug);
+	}
+
+	/** Horario semanal para la sección "Horarios". Sin bloqueos ni ids de miembros. */
+	@GetMapping("/horarios")
+	public List<FranjaHorariaResponse> horarios(@PathVariable String slug) {
+		return horarioService.listarPublico(slug);
 	}
 
 }
