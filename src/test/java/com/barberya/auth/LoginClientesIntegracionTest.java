@@ -33,7 +33,7 @@ import jakarta.servlet.http.Cookie;
  * de un código se commitean aunque la respuesta sea 401, y eso hay que verlo en la base.
  */
 @AutoConfigureMockMvc
-@Import(AuthFalsosConfig.class)
+@Import(DoblesDeTestConfig.class)
 class LoginClientesIntegracionTest extends IntegracionConLimpiezaTest {
 
 	private static final String PASSWORD = "clave-segura-1";
@@ -44,9 +44,9 @@ class LoginClientesIntegracionTest extends IntegracionConLimpiezaTest {
 	@Autowired
 	private JwtDecoder jwtDecoder;
 	@Autowired
-	private AuthFalsosConfig.EnvioMailsFalso envioMails;
+	private DoblesDeTestConfig.EnvioMailsFalso envioMails;
 	@Autowired
-	private AuthFalsosConfig.VerificadorGoogleFalso google;
+	private DoblesDeTestConfig.VerificadorGoogleFalso google;
 
 	@BeforeEach
 	void limpiarDobles() {

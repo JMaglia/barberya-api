@@ -16,17 +16,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-import com.barberya.auth.AuthFalsosConfig;
+import com.barberya.auth.DoblesDeTestConfig;
 import com.barberya.auth.TokenService;
 import com.barberya.auth.UsuarioRepository;
 import com.jayway.jsonpath.JsonPath;
 
 /**
  * Base de los tests de endpoints con login: usuarios insertados por JDBC y tokens firmados con el
- * {@link TokenService} real. Importa {@link AuthFalsosConfig} para compartir el contexto con los tests de auth.
+ * {@link TokenService} real. Importa {@link DoblesDeTestConfig} para compartir el contexto con los tests de auth.
  */
 @AutoConfigureMockMvc
-@Import(AuthFalsosConfig.class)
+@Import(DoblesDeTestConfig.class)
 public abstract class ApiIntegracionTest extends IntegracionConLimpiezaTest {
 
 	@Autowired
