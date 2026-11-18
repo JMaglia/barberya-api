@@ -13,9 +13,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.validation.method.ParameterErrors;
 
 import com.barberya.auth.CodigoInvalidoException;
 import com.barberya.auth.CredencialesInvalidasException;
@@ -47,6 +52,50 @@ public class ManejadorErrores {
 		error.getBindingResult().getFieldErrors()
 				.forEach(campo -> errores.putIfAbsent(campo.getField(), campo.getDefaultMessage()));
 		problema.setProperty("errores", errores);
+		return problema;
+	}
+
+	/** Validación de los elementos de una lista en el body (ej. PUT /horarios): las claves quedan {@code [i].campo}. */
+	@ExceptionHandler(HandlerMethodValidationException.class)
+	ProblemDetail datosInvalidosEnLista(HandlerMethodValidationException error) {
+		ProblemDetail problema = problema(HttpStatus.BAD_REQUEST, "Datos inválidos", "Revisá los datos ingresados");
+		Map<String, String> errores = new LinkedHashMap<>();
+		error.getParameterValidationResults().forEach(resultado -> {
+			String prefijo = resultado.getContainerIndex() != null ? "[" + resultado.getContainerIndex() + "]" : "";
+			if (resultado instanceof ParameterErrors errs) {
+				for (FieldError campo : errs.getFieldErrors()) {
+					errores.putIfAbsent(prefijo + "." + campo.getField(), campo.getDefaultMessage());
+				}
+			}
+			else {
+				resultado.getResolvableErrors().forEach(e -> errores.putIfAbsent(
+						prefijo.isEmpty() ? resultado.getMethodParameter().getParameterName() : prefijo, e.getDefaultMessage()));
+			}
+		});
+		problema.setProperty("errores", errores);
+		return problema;
+	}
+
+	@ExceptionHandler(DatosInvalidosException.class)
+	ProblemDetail datosInvalidosDeNegocio(DatosInvalidosException error) {
+		ProblemDetail problema = problema(HttpStatus.BAD_REQUEST, "Datos inválidos", error.getMessage());
+		problema.setProperty("errores", Map.of(error.getCampo(), error.getMessage()));
+		return problema;
+	}
+
+	@ExceptionHandler(MissingServletRequestParameterException.class)
+	ProblemDetail faltaParametro(MissingServletRequestParameterException error) {
+		String mensaje = "Falta el parámetro " + error.getParameterName();
+		ProblemDetail problema = problema(HttpStatus.BAD_REQUEST, "Datos inválidos", mensaje);
+		problema.setProperty("errores", Map.of(error.getParameterName(), mensaje));
+		return problema;
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	ProblemDetail parametroInvalido(MethodArgumentTypeMismatchException error) {
+		String mensaje = "El parámetro " + error.getName() + " no es válido";
+		ProblemDetail problema = problema(HttpStatus.BAD_REQUEST, "Datos inválidos", mensaje);
+		problema.setProperty("errores", Map.of(error.getName(), mensaje));
 		return problema;
 	}
 

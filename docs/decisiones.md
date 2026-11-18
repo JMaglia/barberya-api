@@ -50,3 +50,5 @@ Registro de decisiones cerradas. Si algo cambia, se agrega una línea nueva con 
 - Fechas en UTC; la app corre con `-Duser.timezone=UTC` (Windows manda el alias viejo
   `America/Buenos_Aires`, que Postgres 16 rechaza).
 - PostgreSQL 16, Flyway, Testcontainers. Docker Compose para la base local.
+- 2026-11-17: el horario semanal no admite `24:00` ni franjas que crucen la medianoche (`LocalTime` no tiene `24:00`):
+  la última hora de cierre posible es `23:55`. Alcanza para las barberías del piloto; si alguna cierra más tarde, se revisa.
