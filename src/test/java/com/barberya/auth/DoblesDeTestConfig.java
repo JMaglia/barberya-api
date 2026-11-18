@@ -9,12 +9,15 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
+import com.barberya.RelojDeTest;
+
 /**
- * Dobles de los tests de auth: no mandan mails ni llaman a Google. Las clases que los importan comparten
- * el mismo contexto de Spring; cada test tiene que llamar a {@code limpiar()} antes de empezar.
+ * Dobles de los tests: no mandan mails, no llaman a Google y el reloj se puede fijar. Las clases que los
+ * importan comparten el mismo contexto de Spring; cada test tiene que llamar a {@code limpiar()} (o
+ * {@code usarReal()} en el reloj) antes de empezar o al terminar.
  */
 @TestConfiguration(proxyBeanMethods = false)
-public class AuthFalsosConfig {
+public class DoblesDeTestConfig {
 
 	@Bean
 	@Primary
@@ -26,6 +29,12 @@ public class AuthFalsosConfig {
 	@Primary
 	VerificadorGoogleFalso verificadorGoogleFalso() {
 		return new VerificadorGoogleFalso();
+	}
+
+	@Bean
+	@Primary
+	RelojDeTest relojDeTest() {
+		return new RelojDeTest();
 	}
 
 	/** Guarda los links y los códigos en vez de mandarlos, para que el test los use. */

@@ -27,7 +27,7 @@ import com.barberya.IntegracionConLimpiezaTest;
  * acaba de crear, así el insert choca con el UNIQUE. Tiene que responder 409, no 500.
  */
 @AutoConfigureMockMvc
-@Import(AuthFalsosConfig.class)
+@Import(DoblesDeTestConfig.class)
 class AltaSimultaneaIntegracionTest extends IntegracionConLimpiezaTest {
 
 	private static final String CUENTA_DUPLICADA = "Ya existe una cuenta con ese mail, probá entrar de nuevo";
@@ -37,9 +37,9 @@ class AltaSimultaneaIntegracionTest extends IntegracionConLimpiezaTest {
 	@MockitoSpyBean
 	private UsuarioRepository usuarios;
 	@Autowired
-	private AuthFalsosConfig.EnvioMailsFalso envioMails;
+	private DoblesDeTestConfig.EnvioMailsFalso envioMails;
 	@Autowired
-	private AuthFalsosConfig.VerificadorGoogleFalso google;
+	private DoblesDeTestConfig.VerificadorGoogleFalso google;
 
 	@BeforeEach
 	void limpiarDobles() {

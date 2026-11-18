@@ -33,7 +33,7 @@ import jakarta.servlet.http.Cookie;
  * refresh se commitea aunque la respuesta sea 401, y eso hay que verlo en la base.
  */
 @AutoConfigureMockMvc
-@Import(AuthFalsosConfig.class)
+@Import(DoblesDeTestConfig.class)
 class AuthIntegracionTest extends IntegracionConLimpiezaTest {
 
 	private static final String PASSWORD = "clave-segura-1";
@@ -44,7 +44,7 @@ class AuthIntegracionTest extends IntegracionConLimpiezaTest {
 	@Autowired
 	private JwtDecoder jwtDecoder;
 	@Autowired
-	private AuthFalsosConfig.EnvioMailsFalso envioMails;
+	private DoblesDeTestConfig.EnvioMailsFalso envioMails;
 
 	@BeforeEach
 	void limpiarMails() {
