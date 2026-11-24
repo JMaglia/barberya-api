@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<!-- Partes comunes de los mails. Estilos inline (los clientes de mail ignoran <style>), sin imágenes ni fuentes externas. -->
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<tr th:fragment="encabezado">
+	<td style="padding:24px 32px;border-bottom:2px solid #c9a227;font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:bold;letter-spacing:1px;color:#c9a227;">
+		BarberYA
+	</td>
+</tr>
+
+<tr th:fragment="pie">
+	<td style="padding:20px 32px;border-top:1px solid #2a2a2a;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#8a8a8a;">
+		Si no pediste este mail, ignoralo: tu cuenta sigue igual.<br>
+		BarberYA · Turnos online para barberías
+	</td>
+</tr>
+
+</body>
+</html>

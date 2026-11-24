@@ -1,0 +1,11 @@
+[(${saludo})]
+
+Pediste restablecer tu contraseña de BarberYA. Entrá a este link para elegir una nueva:
+
+[(${link})]
+
+El link vence en [(${minutos})] minutos y sirve una sola vez.
+
+--
+Si no pediste este mail, ignoralo: tu cuenta sigue igual.
+BarberYA · Turnos online para barberías
