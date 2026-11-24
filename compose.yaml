@@ -6,7 +6,7 @@ services:
       - 'POSTGRES_USER=barberya'
       - 'POSTGRES_PASSWORD=barberya'
     ports:
-      - '5432:5432'
+      - '5433:5432'
 
   # Buzón falso para desarrollo: SMTP en 1025, interfaz web en http://localhost:8025
   mailpit:
