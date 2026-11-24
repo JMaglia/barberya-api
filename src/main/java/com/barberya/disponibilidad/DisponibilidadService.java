@@ -104,6 +104,7 @@ public class DisponibilidadService {
 		ZoneId zona = zona(barberia);
 		Duration pausa = Duration.ofMinutes(barberia.getPausaEntreTurnosMin());
 		LocalDate fechaMaxima = LocalDate.ofInstant(ahora, zona).plusDays(barberia.getReservaMaxDias());
+		Instant primerInicio = ahora.plus(Duration.ofMinutes(barberia.getReservaMinMinutos()));
 		Instant inicioRango = desde.atStartOfDay(zona).toInstant();
 		Instant finRango = hasta.plusDays(1).atStartOfDay(zona).toInstant();
 
@@ -134,7 +135,7 @@ public class DisponibilidadService {
 			var parametros = new ParametrosDisponibilidad(zona, desde, hasta, franjas,
 					turnosPorMiembro.getOrDefault(miembroId, List.of()),
 					bloqueosPorMiembro.getOrDefault(miembroId, List.of()),
-					Duration.ofMinutes(servicio.getDuracionMin()), pausa, PASO, ahora, fechaMaxima);
+					Duration.ofMinutes(servicio.getDuracionMin()), pausa, PASO, primerInicio, fechaMaxima);
 			CalculadoraDisponibilidad.calcular(parametros).forEach((fecha, inicios) -> {
 				for (ZonedDateTime inicio : inicios) {
 					resultado.get(fecha).putIfAbsent(inicio.toInstant(), miembro);

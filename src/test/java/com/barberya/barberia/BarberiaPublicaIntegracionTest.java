@@ -29,6 +29,7 @@ class BarberiaPublicaIntegracionTest extends ApiIntegracionTest {
 				.andExpect(jsonPath("$.zonaHoraria").value("America/Argentina/Buenos_Aires"))
 				.andExpect(jsonPath("$.cancelarHastaHoras").value(12))
 				.andExpect(jsonPath("$.reservaMaxDias").value(30))
+				.andExpect(jsonPath("$.reservaMinMinutos").value(60))
 				.andExpect(jsonPath("$.id").doesNotExist())
 				.andExpect(jsonPath("$.activa").doesNotExist())
 				.andExpect(jsonPath("$.pausaEntreTurnosMin").doesNotExist())

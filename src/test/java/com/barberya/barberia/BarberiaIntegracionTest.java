@@ -218,6 +218,25 @@ class BarberiaIntegracionTest extends ApiIntegracionTest {
 	}
 
 	@Test
+	void anticipacionMinimaVaDe0A1440Minutos() throws Exception {
+		String token = duenoConBarberia("a@mail.com", "Lo de Juan");
+		getCon(token, "/api/v1/barberia").andExpect(jsonPath("$.reservaMinMinutos").value(60));
+
+		for (int valor : new int[] { 0, 1440 }) {
+			patchCon(token, "/api/v1/barberia", "{\"reservaMinMinutos\":" + valor + "}")
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$.reservaMinMinutos").value(valor));
+		}
+		for (int valor : new int[] { -1, 1441 }) {
+			patchCon(token, "/api/v1/barberia", "{\"reservaMinMinutos\":" + valor + "}")
+					.andExpect(status().isBadRequest())
+					.andExpect(jsonPath("$.errores.reservaMinMinutos")
+							.value("La anticipación mínima va de 0 a 1440 minutos"));
+		}
+		getCon(token, "/api/v1/barberia").andExpect(jsonPath("$.reservaMinMinutos").value(1440));
+	}
+
+	@Test
 	void patchConSlugDeOtraBarberiaOReservadoDa409YConElPropioNo() throws Exception {
 		duenoConBarberia("b@mail.com", "Barbería B");
 		String tokenA = duenoConBarberia("a@mail.com", "Barbería A");

@@ -22,6 +22,10 @@ Registro de decisiones cerradas. Si algo cambia, se agrega una línea nueva con 
   El front pide nombre y celular (`PATCH /me`, `perfilCompleto`) antes de dejar reservar.
 - 2026-11-17: al entrar con Google o con código en una cuenta con el mail sin verificar, se borra su contraseña y se
   cierran sus sesiones, para que nadie pueda registrar un mail ajeno y seguir entrando cuando el dueño real lo usa.
+- 2026-11-24: anticipación mínima para reservar, configurable por barbería (`reserva_min_minutos`, por defecto 60):
+  no se ofrecen ni se aceptan inicios a menos de ese tiempo de ahora.
+- 2026-11-24: un cliente puede tener como máximo 4 turnos futuros `CONFIRMADO` en una misma barbería.
+- 2026-11-24: el dueño no reserva como cliente en su propia barbería; los turnos de su agenda los carga desde la agenda.
 
 ## Turnos y plata
 - Al marcar un turno como completado se registra el cobro automáticamente, sin medio de pago.

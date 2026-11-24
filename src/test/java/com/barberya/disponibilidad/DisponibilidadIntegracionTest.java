@@ -79,9 +79,9 @@ class DisponibilidadIntegracionTest extends ApiIntegracionTest {
 				.andExpect(jsonPath("$.zonaHoraria").value("America/Argentina/Buenos_Aires"))
 				.andExpect(jsonPath("$.duracionMin").value(30))
 				.andExpect(jsonPath("$.dias[*].fecha", contains("2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19")))
-				// Lunes = hoy: 09:00 ya es "ahora", no se ofrece.
-				.andExpect(jsonPath("$.dias[0].horarios[0]").value("2026-11-16T09:15:00-03:00"))
-				.andExpect(jsonPath("$.dias[0].horarios", hasSize(6)))
+				// Lunes = hoy, 09:00: con la anticipación mínima por defecto (60 min) arranca a las 10:00.
+				.andExpect(jsonPath("$.dias[0].horarios[0]").value("2026-11-16T10:00:00-03:00"))
+				.andExpect(jsonPath("$.dias[0].horarios", hasSize(3)))
 				.andExpect(jsonPath("$.dias[1].horarios", hasSize(0)))
 				.andExpect(jsonPath("$.dias[2].horarios[0]").value("2026-11-18T09:00:00-03:00"))
 				.andExpect(jsonPath("$.dias[2].horarios[6]").value("2026-11-18T10:30:00-03:00"))
@@ -107,7 +107,7 @@ class DisponibilidadIntegracionTest extends ApiIntegracionTest {
 		disponibilidad("barberia-a", servicioA, LUNES.minusDays(6), LUNES)
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.dias[*].fecha", contains("2026-11-16")))
-				.andExpect(jsonPath("$.dias[0].horarios[0]").value("2026-11-16T09:15:00-03:00"));
+				.andExpect(jsonPath("$.dias[0].horarios[0]").value("2026-11-16T10:00:00-03:00"));
 
 		disponibilidad("barberia-a", servicioA, LUNES.minusDays(10), LUNES.minusDays(1))
 				.andExpect(status().isOk())
@@ -237,9 +237,28 @@ class DisponibilidadIntegracionTest extends ApiIntegracionTest {
 				assertThat(miembro).as(hora.toString()).isEmpty();
 			}
 		}
-		// Hoy a las 09:00 = "ahora": ya no.
+		// Hoy a las 09:00 = "ahora": con 60 min de anticipación, 09:45 ya no y 10:00 sí.
 		assertThat(disponibilidadService.estaDisponible(barberia, servicio, AHORA)).isEmpty();
-		assertThat(disponibilidadService.estaDisponible(barberia, servicio, instante(LUNES, "09:15"))).isPresent();
+		assertThat(disponibilidadService.estaDisponible(barberia, servicio, instante(LUNES, "09:45"))).isEmpty();
+		assertThat(disponibilidadService.estaDisponible(barberia, servicio, instante(LUNES, "10:00"))).isPresent();
+	}
+
+	@Test
+	void unInicioA60MinutosApareceYA59No() throws Exception {
+		assertThat(horasDe("barberia-a", servicioA, LUNES)).containsExactly("10:00", "10:15", "10:30");
+
+		reloj.fijar(AHORA.plusSeconds(60));
+		assertThat(horasDe("barberia-a", servicioA, LUNES)).containsExactly("10:15", "10:30");
+	}
+
+	@Test
+	void laAnticipacionMinimaEsDeCadaBarberia() throws Exception {
+		jdbc.update("UPDATE barberias SET reserva_min_minutos = 30 WHERE slug = 'barberia-a'");
+		assertThat(horasDe("barberia-a", servicioA, LUNES)).containsExactly("09:30", "09:45", "10:00", "10:15",
+				"10:30");
+
+		jdbc.update("UPDATE barberias SET reserva_min_minutos = 120 WHERE slug = 'barberia-a'");
+		assertThat(horasDe("barberia-a", servicioA, LUNES)).isEmpty();
 	}
 
 	// ---------------------------------------------------------------------------------------------------------

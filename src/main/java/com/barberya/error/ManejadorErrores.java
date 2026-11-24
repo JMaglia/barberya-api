@@ -34,6 +34,9 @@ import com.barberya.auth.UsuarioActual;
 import com.barberya.barberia.SlugNoDisponibleException;
 import com.barberya.barberia.YaTieneBarberiaException;
 import com.barberya.servicio.ServicioDuplicadoException;
+import com.barberya.turno.ConflictoTurnoException;
+import com.barberya.turno.FichaEnCursoException;
+import com.barberya.turno.ReservaEnBarberiaPropiaException;
 
 /** Errores en formato ProblemDetail (RFC 7807), con mensaje en español. */
 @RestControllerAdvice
@@ -176,6 +179,24 @@ public class ManejadorErrores {
 	@ExceptionHandler(ServicioDuplicadoException.class)
 	ProblemDetail servicioDuplicado(ServicioDuplicadoException error) {
 		return problema(HttpStatus.CONFLICT, "Servicio repetido", error.getMessage());
+	}
+
+	/** {@code codigo} le dice al front qué hacer (completar el perfil, elegir otro horario...) sin leer el texto. */
+	@ExceptionHandler(ConflictoTurnoException.class)
+	ProblemDetail conflictoTurno(ConflictoTurnoException error) {
+		ProblemDetail problema = problema(HttpStatus.CONFLICT, "No se pudo completar", error.getMessage());
+		problema.setProperty("codigo", error.getCodigo().name());
+		return problema;
+	}
+
+	@ExceptionHandler(ReservaEnBarberiaPropiaException.class)
+	ProblemDetail reservaEnBarberiaPropia(ReservaEnBarberiaPropiaException error) {
+		return problema(HttpStatus.BAD_REQUEST, "Reserva no permitida", error.getMessage());
+	}
+
+	@ExceptionHandler(FichaEnCursoException.class)
+	ProblemDetail fichaEnCurso(FichaEnCursoException error) {
+		return problema(HttpStatus.CONFLICT, "Reserva en curso", error.getMessage());
 	}
 
 	private static ProblemDetail problema(HttpStatus estado, String titulo, String detalle) {

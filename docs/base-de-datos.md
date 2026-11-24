@@ -43,6 +43,7 @@ Modelo de datos de BarberYA (PostgreSQL 16). Parte de `docs/Informacion_BD.pdf`;
 | `zona_horaria` | `VARCHAR(50)` | NN, def. `'America/Argentina/Buenos_Aires'` |
 | `cancelar_hasta_horas` | `INT` | NN, def. `24`, `>= 0` |
 | `reserva_max_dias` | `INT` | NN, def. `30`, `> 0` |
+| `reserva_min_minutos` | `INT` | NN, def. `60`, `>= 0`. Anticipación mínima para reservar |
 | `pausa_entre_turnos_min` | `INT` | NN, def. `0`, `>= 0` |
 | `activa` | `BOOLEAN` | NN, def. `TRUE`. Solo suspensión manual del admin; el acceso lo decide la suscripción |
 | `creado_en` | `TIMESTAMPTZ` | NN, def. `now()` |
@@ -338,7 +339,7 @@ Baja lógica: un proveedor inactivo no aparece al cargar gastos nuevos, pero los
 
 La base no impide estos casos:
 
-- **Horarios libres:** respetar la pausa entre turnos, el horario de atención, los bloqueos y `reserva_max_dias`. Una fila de `turnos` puede pisar un bloqueo o quedar fuera de horario.
+- **Horarios libres:** respetar la pausa entre turnos, el horario de atención, los bloqueos, `reserva_min_minutos` y `reserva_max_dias`. Una fila de `turnos` puede pisar un bloqueo o quedar fuera de horario.
 - **Horarios de atención:** que las franjas de un mismo día no se superpongan.
 - **Cancelación:** respetar `cancelar_hasta_horas`.
 - **Revertir un turno completado:** borrar su cobro automático.
@@ -349,6 +350,7 @@ La base no impide estos casos:
 - **Slugs:** reservar los que chocan con rutas de la web, como `api` o `login`.
 - **Mails:** normalizarlos a minúsculas antes de guardar.
 - **Códigos:** limitar `intentos` y exigir `usuario_id` en `RECUPERAR_CLAVE`.
+- **Reservas:** como máximo 4 turnos `CONFIRMADO` futuros por ficha de cliente; un miembro no reserva como cliente en su propia barbería.
 - **Celular:** pedirlo al cliente antes de su primera reserva; en `usuarios.telefono` es nullable porque Google no lo informa.
 
 ## v2, no va en V1

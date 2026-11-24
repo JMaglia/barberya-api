@@ -40,6 +40,10 @@ public record ActualizarBarberiaRequest(
 		@Max(value = 365, message = "Los días de anticipación van de 1 a 365")
 		Integer reservaMaxDias,
 
+		@Min(value = 0, message = "La anticipación mínima va de 0 a 1440 minutos")
+		@Max(value = 1440, message = "La anticipación mínima va de 0 a 1440 minutos")
+		Integer reservaMinMinutos,
+
 		@Min(value = 0, message = "La pausa entre turnos va de 0 a 120 minutos")
 		@Max(value = 120, message = "La pausa entre turnos va de 0 a 120 minutos")
 		Integer pausaEntreTurnosMin) {

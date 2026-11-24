@@ -89,6 +89,9 @@ public class BarberiaService {
 		if (request.reservaMaxDias() != null) {
 			barberia.setReservaMaxDias(request.reservaMaxDias());
 		}
+		if (request.reservaMinMinutos() != null) {
+			barberia.setReservaMinMinutos(request.reservaMinMinutos());
+		}
 		if (request.pausaEntreTurnosMin() != null) {
 			barberia.setPausaEntreTurnosMin(request.pausaEntreTurnosMin());
 		}

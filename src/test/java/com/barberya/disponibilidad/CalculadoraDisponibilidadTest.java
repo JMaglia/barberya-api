@@ -172,13 +172,13 @@ class CalculadoraDisponibilidadTest {
 	}
 
 	@Test
-	void hoyNoOfreceHorasYaPasadas() {
-		assertThat(new Caso().franja(MIERCOLES, "09:00", "12:00").ahora(DIA, "11:05").horasDelDia())
+	void noOfreceIniciosAnterioresAlPrimerInicioPermitido() {
+		assertThat(new Caso().franja(MIERCOLES, "09:00", "12:00").primerInicio(DIA, "11:05").horasDelDia())
 				.containsExactly("11:15", "11:30");
-		// Un inicio igual a "ahora" tampoco: ya empezó.
-		assertThat(new Caso().franja(MIERCOLES, "09:00", "12:00").ahora(DIA, "11:00").horasDelDia())
-				.containsExactly("11:15", "11:30");
-		assertThat(new Caso().franja(MIERCOLES, "09:00", "12:00").ahora(DIA, "12:00").horasDelDia()).isEmpty();
+		// El primer inicio permitido es inclusivo.
+		assertThat(new Caso().franja(MIERCOLES, "09:00", "12:00").primerInicio(DIA, "11:00").horasDelDia())
+				.containsExactly("11:00", "11:15", "11:30");
+		assertThat(new Caso().franja(MIERCOLES, "09:00", "12:00").primerInicio(DIA, "11:31").horasDelDia()).isEmpty();
 	}
 
 	@Test
@@ -208,7 +208,7 @@ class CalculadoraDisponibilidadTest {
 				.zona(NUEVA_YORK)
 				.rango(dia, dia)
 				.franja(DOMINGO, "00:00", "05:00")
-				.ahora(Instant.parse("2026-03-01T00:00:00Z"))
+				.primerInicio(Instant.parse("2026-03-01T00:00:00Z"))
 				.calcular().get(dia);
 
 		// La franja dura 4 horas reales: 16 inicios de 15 min, menos el último (no entra la media hora).
@@ -227,7 +227,7 @@ class CalculadoraDisponibilidadTest {
 				.zona(NUEVA_YORK)
 				.rango(dia, dia)
 				.franja(DOMINGO, "00:00", "03:00")
-				.ahora(Instant.parse("2026-10-25T00:00:00Z"))
+				.primerInicio(Instant.parse("2026-10-25T00:00:00Z"))
 				.calcular().get(dia);
 
 		assertThat(inicios).hasSize(15);
@@ -268,7 +268,7 @@ class CalculadoraDisponibilidadTest {
 		private final List<Intervalo> bloqueos = new ArrayList<>();
 		private int duracionMin = 30;
 		private int pausaMin = 0;
-		private Instant ahora;
+		private Instant primerInicio;
 		private LocalDate fechaMaxima = LocalDate.of(2027, 12, 31);
 
 		Caso zona(ZoneId valor) {
@@ -307,13 +307,13 @@ class CalculadoraDisponibilidadTest {
 			return this;
 		}
 
-		Caso ahora(LocalDate dia, String hora) {
-			ahora = instante(dia, hora);
+		Caso primerInicio(LocalDate dia, String hora) {
+			primerInicio = instante(dia, hora);
 			return this;
 		}
 
-		Caso ahora(Instant valor) {
-			ahora = valor;
+		Caso primerInicio(Instant valor) {
+			primerInicio = valor;
 			return this;
 		}
 
@@ -323,10 +323,11 @@ class CalculadoraDisponibilidadTest {
 		}
 
 		Map<LocalDate, List<ZonedDateTime>> calcular() {
-			Instant ahoraEfectivo = ahora != null ? ahora : desde.minusDays(1).atStartOfDay(zona).toInstant();
+			Instant primerInicioEfectivo = primerInicio != null ? primerInicio
+					: desde.minusDays(1).atStartOfDay(zona).toInstant();
 			return CalculadoraDisponibilidad.calcular(new ParametrosDisponibilidad(zona, desde, hasta, franjas, turnos,
 					bloqueos, Duration.ofMinutes(duracionMin), Duration.ofMinutes(pausaMin), Duration.ofMinutes(15),
-					ahoraEfectivo, fechaMaxima));
+					primerInicioEfectivo, fechaMaxima));
 		}
 
 		/** Inicios del día {@link #DIA} como "HH:mm". */
