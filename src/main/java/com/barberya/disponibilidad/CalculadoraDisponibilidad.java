@@ -12,11 +12,11 @@ import java.util.TreeSet;
 
 /**
  * Calcula los inicios libres de un miembro, día por día. Pura: sin Spring, sin base y sin reloj propio
- * ("ahora" llega por parámetro).
+ * (el primer inicio permitido llega por parámetro).
  *
- * <p>Un inicio {@code t} es válido si {@code [t, t + duración)} entra entero en una franja del día, es posterior a
- * "ahora", no se superpone con ningún bloqueo ni con ningún turno expandido por la pausa
- * ({@code [turno.inicio − pausa, turno.fin + pausa)}). Contiguo no es superpuesto (criterio {@code '[)'}, igual que
+ * <p>Un inicio {@code t} es válido si {@code [t, t + duración)} entra entero en una franja del día, no es anterior al
+ * primer inicio permitido (ahora + anticipación mínima), no se superpone con ningún bloqueo ni con ningún turno
+ * expandido por la pausa ({@code [turno.inicio − pausa, turno.fin + pausa)}). Contiguo no es superpuesto (criterio {@code '[)'}, igual que
  * {@code turnos_sin_superposicion}).
  *
  * <p>Candidatos: la grilla de cada franja (inicio de franja + k × paso) y, para no dejar huecos, el instante "justo
@@ -74,7 +74,7 @@ public final class CalculadoraDisponibilidad {
 				}
 			}
 			for (Instant t : candidatos) {
-				if (t.isAfter(p.ahora()) && libre(t, t.plus(p.duracion()), ocupados)) {
+				if (!t.isBefore(p.primerInicio()) && libre(t, t.plus(p.duracion()), ocupados)) {
 					libres.add(t);
 				}
 			}

@@ -79,6 +79,12 @@ public class Barberia {
 	@Column(name = "reserva_max_dias", nullable = false)
 	private Integer reservaMaxDias = 30;
 
+	/** Anticipación mínima para reservar: no se aceptan inicios a menos de estos minutos de ahora. */
+	@NotNull
+	@PositiveOrZero
+	@Column(name = "reserva_min_minutos", nullable = false)
+	private Integer reservaMinMinutos = 60;
+
 	@NotNull
 	@PositiveOrZero
 	@Column(name = "pausa_entre_turnos_min", nullable = false)

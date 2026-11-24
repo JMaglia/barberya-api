@@ -28,6 +28,7 @@ CREATE TABLE barberias (
     zona_horaria           VARCHAR(50)  NOT NULL DEFAULT 'America/Argentina/Buenos_Aires',
     cancelar_hasta_horas   INT          NOT NULL DEFAULT 24 CHECK (cancelar_hasta_horas >= 0),
     reserva_max_dias       INT          NOT NULL DEFAULT 30 CHECK (reserva_max_dias > 0),
+    reserva_min_minutos    INT          NOT NULL DEFAULT 60 CHECK (reserva_min_minutos >= 0),
     pausa_entre_turnos_min INT          NOT NULL DEFAULT 0 CHECK (pausa_entre_turnos_min >= 0),
     activa                 BOOLEAN      NOT NULL DEFAULT TRUE,
     creado_en              TIMESTAMPTZ  NOT NULL DEFAULT now()

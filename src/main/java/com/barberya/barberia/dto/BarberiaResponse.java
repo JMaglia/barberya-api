@@ -12,12 +12,14 @@ public record BarberiaResponse(
 		String zonaHoraria,
 		int cancelarHastaHoras,
 		int reservaMaxDias,
+		int reservaMinMinutos,
 		int pausaEntreTurnosMin,
 		boolean activa) {
 
 	public static BarberiaResponse de(Barberia b) {
 		return new BarberiaResponse(b.getId(), b.getNombre(), b.getSlug(), b.getTelefono(), b.getDireccion(),
-				b.getZonaHoraria(), b.getCancelarHastaHoras(), b.getReservaMaxDias(), b.getPausaEntreTurnosMin(),
+				b.getZonaHoraria(), b.getCancelarHastaHoras(), b.getReservaMaxDias(), b.getReservaMinMinutos(),
+				b.getPausaEntreTurnosMin(),
 				b.isActiva());
 	}
 

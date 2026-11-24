@@ -18,11 +18,11 @@ import java.util.List;
  * @param duracion    duración del servicio
  * @param pausa       pausa entre turnos, antes y después de cada turno
  * @param paso        paso de la grilla de inicios
- * @param ahora       los inicios tienen que ser posteriores
+ * @param primerInicio primer inicio permitido, inclusive (ahora + anticipación mínima)
  * @param fechaMaxima último día reservable (fecha local), inclusive
  */
 public record ParametrosDisponibilidad(ZoneId zona, LocalDate desde, LocalDate hasta, List<FranjaSemanal> franjas,
-		List<Intervalo> turnos, List<Intervalo> bloqueos, Duration duracion, Duration pausa, Duration paso, Instant ahora,
+		List<Intervalo> turnos, List<Intervalo> bloqueos, Duration duracion, Duration pausa, Duration paso, Instant primerInicio,
 		LocalDate fechaMaxima) {
 
 	public ParametrosDisponibilidad {

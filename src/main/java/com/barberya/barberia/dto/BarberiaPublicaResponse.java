@@ -10,11 +10,12 @@ public record BarberiaPublicaResponse(
 		String telefono,
 		String zonaHoraria,
 		int cancelarHastaHoras,
-		int reservaMaxDias) {
+		int reservaMaxDias,
+		int reservaMinMinutos) {
 
 	public static BarberiaPublicaResponse de(Barberia b) {
 		return new BarberiaPublicaResponse(b.getNombre(), b.getSlug(), b.getDireccion(), b.getTelefono(),
-				b.getZonaHoraria(), b.getCancelarHastaHoras(), b.getReservaMaxDias());
+				b.getZonaHoraria(), b.getCancelarHastaHoras(), b.getReservaMaxDias(), b.getReservaMinMinutos());
 	}
 
 }
