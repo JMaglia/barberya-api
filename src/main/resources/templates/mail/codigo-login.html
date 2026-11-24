@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Tu código para entrar a BarberYA</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0f0f0f;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0f0f0f;">
+	<tr>
+		<td align="center" style="padding:32px 16px;">
+			<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+				style="max-width:480px;background-color:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;">
+				<tr th:replace="~{fragmentos.html :: encabezado}"></tr>
+				<tr>
+					<td style="padding:32px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:24px;color:#e8e8e8;">
+						<p style="margin:0 0 16px;" th:text="${saludo}">¡Hola!</p>
+						<p style="margin:0 0 24px;">Este es tu código para entrar a BarberYA:</p>
+						<p style="margin:0 0 24px;text-align:center;font-family:'Courier New',Courier,monospace;font-size:36px;font-weight:bold;letter-spacing:8px;color:#c9a227;"
+							th:text="${codigo}">000000</p>
+						<p style="margin:0;color:#b5b5b5;font-size:14px;">
+							Vence en <span th:text="${minutos}">10</span> minutos. No se lo pases a nadie.
+						</p>
+					</td>
+				</tr>
+				<tr th:replace="~{fragmentos.html :: pie}"></tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

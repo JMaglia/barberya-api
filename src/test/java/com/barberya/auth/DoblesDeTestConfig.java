@@ -44,12 +44,12 @@ public class DoblesDeTestConfig {
 		public final List<CodigoEnviado> codigos = new ArrayList<>();
 
 		@Override
-		public void enviarRecuperacionClave(String email, String link) {
+		public void enviarRecuperacionClave(String email, String nombre, String link) {
 			links.add(link);
 		}
 
 		@Override
-		public void enviarCodigo(String email, String codigo) {
+		public void enviarCodigo(String email, String nombre, String codigo) {
 			codigos.add(new CodigoEnviado(email, codigo));
 		}
 

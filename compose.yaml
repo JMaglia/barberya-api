@@ -7,3 +7,10 @@ services:
       - 'POSTGRES_PASSWORD=barberya'
     ports:
       - '5432:5432'
+
+  # Buzón falso para desarrollo: SMTP en 1025, interfaz web en http://localhost:8025
+  mailpit:
+    image: 'axllent/mailpit'
+    ports:
+      - '1025:1025'
+      - '8025:8025'

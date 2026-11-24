@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /** Configuración propia de la app ({@code barberya.*}). */
 @ConfigurationProperties(prefix = "barberya")
-public record BarberyaProperties(Jwt jwt, String frontUrl, Google google) {
+public record BarberyaProperties(Jwt jwt, String frontUrl, Google google, Mail mail) {
 
 	public BarberyaProperties {
 		if (frontUrl == null || frontUrl.isBlank()) {
@@ -14,6 +14,19 @@ public record BarberyaProperties(Jwt jwt, String frontUrl, Google google) {
 		}
 		if (google == null) {
 			throw new IllegalStateException("Falta barberya.google.client-id (variable GOOGLE_CLIENT_ID)");
+		}
+		if (mail == null) {
+			throw new IllegalStateException("Falta barberya.mail.remitente (variable MAIL_FROM)");
+		}
+	}
+
+	/** {@code remitente}: el From de los mails, por ejemplo {@code BarberYA <no-responder@barberya.app>}. */
+	public record Mail(String remitente) {
+
+		public Mail {
+			if (remitente == null || remitente.isBlank()) {
+				throw new IllegalStateException("Falta barberya.mail.remitente (variable MAIL_FROM)");
+			}
 		}
 	}
 

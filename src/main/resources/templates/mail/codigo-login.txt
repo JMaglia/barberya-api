@@ -1,0 +1,11 @@
+[(${saludo})]
+
+Este es tu código para entrar a BarberYA:
+
+    [(${codigo})]
+
+Vence en [(${minutos})] minutos. No se lo pases a nadie.
+
+--
+Si no pediste este mail, ignoralo: tu cuenta sigue igual.
+BarberYA · Turnos online para barberías

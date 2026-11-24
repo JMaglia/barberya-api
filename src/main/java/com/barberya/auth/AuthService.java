@@ -140,9 +140,10 @@ public class AuthService {
 		String codigo = tokenService.nuevoCodigo();
 		TokenVerificacion token = new TokenVerificacion(email, TipoTokenVerificacion.CODIGO_LOGIN,
 				TokenService.sha256(codigo), ahora.plus(CODIGO_LOGIN));
-		usuarios.findByEmail(email).ifPresent(token::setUsuario);
+		Usuario usuario = usuarios.findByEmail(email).orElse(null);
+		token.setUsuario(usuario);
 		tokensVerificacion.save(token);
-		envioMails.enviarCodigo(email, codigo);
+		envioMails.enviarCodigo(email, usuario != null ? usuario.getNombre() : null, codigo);
 	}
 
 	/**
@@ -213,7 +214,7 @@ public class AuthService {
 					TokenService.sha256(valor), Instant.now().plus(TOKEN_RECUPERACION));
 			token.setUsuario(usuario);
 			tokensVerificacion.save(token);
-			envioMails.enviarRecuperacionClave(usuario.getEmail(), frontUrl + "/restablecer?token=" + valor);
+			envioMails.enviarRecuperacionClave(usuario.getEmail(), usuario.getNombre(), frontUrl + "/restablecer?token=" + valor);
 		});
 	}
 
