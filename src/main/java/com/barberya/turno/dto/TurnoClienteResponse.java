@@ -1,7 +1,6 @@
 package com.barberya.turno.dto;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
@@ -38,7 +37,7 @@ public record TurnoClienteResponse(
 				t.getFin().atZone(zona).toOffsetDateTime(), t.getEstado(), t.getPrecio(),
 				new ServicioTurno(s.getNombre(), s.getDuracionMin()),
 				new BarberiaTurno(b.getNombre(), b.getSlug(), b.getDireccion(), b.getTelefono()),
-				t.getInicio().minus(Duration.ofHours(b.getCancelarHastaHoras())).atZone(zona).toOffsetDateTime());
+				t.cancelableHasta().atZone(zona).toOffsetDateTime());
 	}
 
 }

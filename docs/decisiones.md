@@ -41,6 +41,10 @@ Registro de decisiones cerradas. Si algo cambia, se agrega una línea nueva con 
 ## Notificaciones
 - MVP: mail de confirmación y recordatorio + botón que abre WhatsApp con el mensaje armado (wa.me).
 - WhatsApp automático por API: extra pago, más adelante (cuesta USD por mensaje).
+- 2026-11-24: no se mandan mails de confirmación ni de recordatorio de turnos; los mails son solo de cuenta (código de
+  login, recuperar contraseña). El cliente puede agregar el turno a su calendario (.ics). El barbero tiene un botón
+  opcional de WhatsApp (wa.me) en el detalle del turno, que arma el front, para usar si quiere (no es una tarea diaria).
+  WhatsApp automático por API queda como extra pago a futuro; `turnos.recordatorio_enviado_en` se mantiene para eso.
 
 ## Negocio
 - Suscripción mensual en pesos, cobrada con suscripciones de Mercado Pago (preapproval).

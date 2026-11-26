@@ -113,7 +113,7 @@ public class TurnoService {
 		}
 		Instant ahora = reloj.instant();
 		int horas = turno.getBarberia().getCancelarHastaHoras();
-		if (!ahora.isBefore(turno.getInicio().minus(Duration.ofHours(horas)))) {
+		if (!ahora.isBefore(turno.cancelableHasta())) {
 			throw new ConflictoTurnoException(CodigoConflictoTurno.FUERA_DE_PLAZO,
 					"Solo se puede cancelar hasta " + horas + (horas == 1 ? " hora" : " horas") + " antes");
 		}

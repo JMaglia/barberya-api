@@ -1,6 +1,7 @@
 package com.barberya.turno;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 
 import org.hibernate.annotations.Generated;
@@ -109,6 +110,11 @@ public class Turno {
 		this.inicio = inicio;
 		this.fin = fin;
 		this.precio = precio;
+	}
+
+	/** El cliente puede cancelar antes de este instante: inicio menos el plazo de la barbería. */
+	public Instant cancelableHasta() {
+		return inicio.minus(Duration.ofHours(barberia.getCancelarHastaHoras()));
 	}
 
 	@Override
