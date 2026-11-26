@@ -7,6 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.barberya.auth.LimitadorIntentosEnMemoria;
+
 /**
  * Base para tests de integración sin {@code @Transactional}: vacía la base antes y después de cada test,
  * así no quedan datos commiteados en el contenedor compartido.
@@ -19,10 +21,15 @@ public abstract class IntegracionConLimpiezaTest {
 	@Autowired
 	protected JdbcTemplate jdbc;
 
+	@Autowired
+	private LimitadorIntentosEnMemoria limitador;
+
+	/** También vacía los límites de intentos: los tests hacen muchos pedidos desde la misma IP de MockMvc. */
 	@BeforeEach
 	@AfterEach
 	void limpiarBase() {
 		jdbc.execute("TRUNCATE barberias, usuarios, planes RESTART IDENTITY CASCADE");
+		limitador.limpiar();
 	}
 
 }

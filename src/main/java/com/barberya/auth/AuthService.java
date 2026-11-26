@@ -322,7 +322,7 @@ public class AuthService {
 		return valor != null && !valor.isBlank();
 	}
 
-	private static String normalizarEmail(String email) {
+	static String normalizarEmail(String email) {
 		return email.trim().toLowerCase(Locale.ROOT);
 	}
 
