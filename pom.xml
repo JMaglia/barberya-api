@@ -68,6 +68,11 @@
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-database-postgresql</artifactId>
 		</dependency>
+		<!-- Mapa con expiración para los contadores del límite de intentos (versión del BOM de Boot). -->
+		<dependency>
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
+		</dependency>
 		<!-- 3.x es la línea de springdoc para Boot 4; 3.2.0 está compilada contra Boot 4.1.2. -->
 		<dependency>
 			<groupId>org.springdoc</groupId>

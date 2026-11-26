@@ -30,6 +30,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import com.barberya.auth.LimitesProperties;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 
 /**
@@ -37,7 +38,7 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
  * El refresh token va en una cookie httpOnly limitada a /api/v1/auth.
  */
 @Configuration
-@EnableConfigurationProperties(BarberyaProperties.class)
+@EnableConfigurationProperties({ BarberyaProperties.class, LimitesProperties.class })
 public class SecurityConfig {
 
 	public static final String EMISOR_JWT = "barberya-api";

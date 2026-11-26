@@ -25,6 +25,7 @@ import org.springframework.validation.method.ParameterErrors;
 import com.barberya.auth.CodigoInvalidoException;
 import com.barberya.auth.CredencialesInvalidasException;
 import com.barberya.auth.CuentaDuplicadaException;
+import com.barberya.auth.DemasiadosIntentosException;
 import com.barberya.auth.EmailYaRegistradoException;
 import com.barberya.auth.GoogleInvalidoException;
 import com.barberya.auth.RefreshCookie;
@@ -197,6 +198,19 @@ public class ManejadorErrores {
 	@ExceptionHandler(FichaEnCursoException.class)
 	ProblemDetail fichaEnCurso(FichaEnCursoException error) {
 		return problema(HttpStatus.CONFLICT, "Reserva en curso", error.getMessage());
+	}
+
+	/** 429 con Retry-After en segundos; {@code codigo} para que el front no tenga que leer el texto. */
+	@ExceptionHandler(DemasiadosIntentosException.class)
+	ResponseEntity<ProblemDetail> demasiadosIntentos(DemasiadosIntentosException error) {
+		long segundos = Math.max(1, (error.getReintentarEn().toMillis() + 999) / 1000);
+		long minutos = (segundos + 59) / 60;
+		String detalle = "Hiciste demasiados intentos. Probá de nuevo en " + minutos + (minutos == 1 ? " minuto." : " minutos.");
+		ProblemDetail problema = problema(HttpStatus.TOO_MANY_REQUESTS, "Demasiados intentos", detalle);
+		problema.setProperty("codigo", "DEMASIADOS_INTENTOS");
+		return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+				.header(HttpHeaders.RETRY_AFTER, String.valueOf(segundos))
+				.body(problema);
 	}
 
 	private static ProblemDetail problema(HttpStatus estado, String titulo, String detalle) {
