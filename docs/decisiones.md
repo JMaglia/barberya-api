@@ -40,6 +40,12 @@ Registro de decisiones cerradas. Si algo cambia, se agrega una línea nueva con 
 - 2026-11-27: un turno solo se puede marcar como completado o "no vino" (`AUSENTE`) desde que empezó (inicio <= ahora).
 - 2026-11-27: revertir devuelve un turno `COMPLETADO` o `AUSENTE` a `CONFIRMADO`; si era `COMPLETADO`, se borra su cobro.
   Un `AUSENTE` vuelve a ocupar su horario: si mientras tanto se reservó otro turno ahí, no se puede revertir.
+- 2026-11-27: el barbero puede cargar turnos a mano en su agenda fuera de su horario, fuera de la grilla de 15 min,
+  sin anticipación mínima y más allá de `reserva_max_dias`. Solo se impide la superposición con otro turno; quedar fuera
+  de horario o pisar un bloqueo se avisa, pero no impide cargarlo.
+- 2026-11-27: el barbero puede cargar un turno que empezó hasta 24 h antes, para registrar a quien vino sin turno y
+  después completarlo.
+- 2026-11-27: un cliente cargado a mano por el barbero tiene ficha sin usuario (`clientes.usuario_id` NULL).
 
 ## Notificaciones
 - MVP: mail de confirmación y recordatorio + botón que abre WhatsApp con el mensaje armado (wa.me).

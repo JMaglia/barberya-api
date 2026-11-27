@@ -351,6 +351,7 @@ La base no impide estos casos:
 - **Mails:** normalizarlos a minúsculas antes de guardar.
 - **Códigos:** limitar `intentos` y exigir `usuario_id` en `RECUPERAR_CLAVE`.
 - **Reservas:** como máximo 4 turnos `CONFIRMADO` futuros por ficha de cliente; un miembro no reserva como cliente en su propia barbería.
+- **Turnos cargados por el barbero:** no aplican las reglas de horarios libres ni de reservas; solo se valida que no pisen otro turno (y que el inicio esté entre 24 h atrás y un año adelante).
 - **Celular:** pedirlo al cliente antes de su primera reserva; en `usuarios.telefono` es nullable porque Google no lo informa.
 
 ## v2, no va en V1

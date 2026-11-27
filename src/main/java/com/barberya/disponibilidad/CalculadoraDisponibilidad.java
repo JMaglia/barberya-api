@@ -51,14 +51,14 @@ public final class CalculadoraDisponibilidad {
 
 	private static List<ZonedDateTime> inicios(ParametrosDisponibilidad p, LocalDate fecha, List<Intervalo> ocupados,
 			List<Instant> justoDespues) {
-		int diaSemana = fecha.getDayOfWeek().getValue() % 7;
+		int diaSemana = FranjaSemanal.diaSemana(fecha);
 		NavigableSet<Instant> libres = new TreeSet<>();
 		for (FranjaSemanal franja : p.franjas()) {
 			if (franja.diaSemana() != diaSemana) {
 				continue;
 			}
-			Instant inicioFranja = ZonedDateTime.of(fecha, franja.inicio(), p.zona()).toInstant();
-			Instant finFranja = ZonedDateTime.of(fecha, franja.fin(), p.zona()).toInstant();
+			Instant inicioFranja = franja.inicioEn(fecha, p.zona());
+			Instant finFranja = franja.finEn(fecha, p.zona());
 			Instant ultimoInicio = finFranja.minus(p.duracion());
 			if (ultimoInicio.isBefore(inicioFranja)) {
 				continue;
