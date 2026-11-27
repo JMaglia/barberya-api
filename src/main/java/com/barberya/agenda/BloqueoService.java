@@ -1,5 +1,6 @@
 package com.barberya.agenda;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -28,18 +29,21 @@ public class BloqueoService {
 	private final BloqueoAgendaRepository bloqueos;
 	private final MiembroBarberiaRepository miembros;
 	private final TurnoRepository turnos;
+	private final Clock reloj;
 
-	public BloqueoService(BloqueoAgendaRepository bloqueos, MiembroBarberiaRepository miembros, TurnoRepository turnos) {
+	public BloqueoService(BloqueoAgendaRepository bloqueos, MiembroBarberiaRepository miembros, TurnoRepository turnos,
+			Clock reloj) {
 		this.bloqueos = bloqueos;
 		this.miembros = miembros;
 		this.turnos = turnos;
+		this.reloj = reloj;
 	}
 
 	@Transactional
 	public BloqueoCreadoResponse crear(Long miembroId, CrearBloqueoRequest request) {
 		Instant inicio = request.inicio().toInstant();
 		Instant fin = request.fin().toInstant();
-		Instant ahora = Instant.now();
+		Instant ahora = reloj.instant();
 		if (!fin.isAfter(inicio)) {
 			throw new DatosInvalidosException("fin", "El fin tiene que ser posterior al inicio");
 		}

@@ -21,16 +21,16 @@ import com.jayway.jsonpath.JsonPath;
  * Barbería A con horario y un servicio, y el reloj fijo en el lunes 16/11/2026 a las 09:00 de Buenos Aires.
  * Anticipación mínima por defecto (60 min): el primer inicio reservable del lunes es a las 10:00.
  */
-abstract class TurnoIntegracionBase extends ApiIntegracionTest {
+public abstract class TurnoIntegracionBase extends ApiIntegracionTest {
 
-	static final ZoneOffset ARG = ZoneOffset.ofHours(-3);
-	static final Instant AHORA = Instant.parse("2026-11-16T12:00:00Z");
-	static final LocalDate LUNES = LocalDate.of(2026, 11, 16);
-	static final LocalDate MARTES = LUNES.plusDays(1);
-	static final LocalDate MIERCOLES = LUNES.plusDays(2);
+	protected static final ZoneOffset ARG = ZoneOffset.ofHours(-3);
+	protected static final Instant AHORA = Instant.parse("2026-11-16T12:00:00Z");
+	protected static final LocalDate LUNES = LocalDate.of(2026, 11, 16);
+	protected static final LocalDate MARTES = LUNES.plusDays(1);
+	protected static final LocalDate MIERCOLES = LUNES.plusDays(2);
 
 	/** Lunes y miércoles de 09:00 a 13:00. */
-	static final String HORARIO = """
+	protected static final String HORARIO = """
 			[{"diaSemana":1,"horaInicio":"09:00","horaFin":"13:00"},
 			 {"diaSemana":3,"horaInicio":"09:00","horaFin":"13:00"}]
 			""";
@@ -43,7 +43,7 @@ abstract class TurnoIntegracionBase extends ApiIntegracionTest {
 	protected Long servicioA;
 
 	@BeforeEach
-	void prepararBarberiaA() throws Exception {
+	protected void prepararBarberiaA() throws Exception {
 		reloj.fijar(AHORA);
 		tokenA = duenoConBarberia("a@mail.com", "Barbería A");
 		putCon(tokenA, "/api/v1/horarios", HORARIO).andExpect(status().isOk());
@@ -52,7 +52,7 @@ abstract class TurnoIntegracionBase extends ApiIntegracionTest {
 	}
 
 	@AfterEach
-	void relojReal() {
+	protected void relojReal() {
 		reloj.usarReal();
 	}
 
@@ -89,12 +89,32 @@ abstract class TurnoIntegracionBase extends ApiIntegracionTest {
 		return jdbc.queryForObject(sql, Long.class, args);
 	}
 
-	static OffsetDateTime offset(LocalDate dia, String hora) {
+	protected static OffsetDateTime offset(LocalDate dia, String hora) {
 		return OffsetDateTime.of(dia, LocalTime.parse(hora), ARG);
 	}
 
-	static Instant instante(LocalDate dia, String hora) {
+	protected static Instant instante(LocalDate dia, String hora) {
 		return offset(dia, hora).toInstant();
+	}
+
+	/** Ficha cargada a mano (sin usuario). */
+	protected Long insertarCliente(Long barberiaId, String nombre, String telefono) {
+		return jdbc.queryForObject("INSERT INTO clientes (barberia_id, nombre, telefono) VALUES (?, ?, ?) RETURNING id",
+				Long.class, barberiaId, nombre, telefono);
+	}
+
+	/** Turno por JDBC, sin pasar por las validaciones de la reserva. Un CANCELADO lo cancela el barbero. */
+	protected Long insertarTurno(Long barberiaId, Long clienteId, Long servicioId, LocalDate dia, String horaInicio,
+			String horaFin, String estado, String precio) {
+		boolean cancelado = estado.equals("CANCELADO");
+		return jdbc.queryForObject("""
+				INSERT INTO turnos (barberia_id, miembro_id, cliente_id, servicio_id, inicio, fin, estado, precio,
+				                    cancelado_en, cancelado_por)
+				VALUES (?, (SELECT id FROM miembros_barberia WHERE barberia_id = ?), ?, ?, ?, ?, ?, ?::numeric, ?, ?)
+				RETURNING id
+				""", Long.class, barberiaId, barberiaId, clienteId, servicioId, offset(dia, horaInicio),
+				offset(dia, horaFin), estado, precio, cancelado ? offset(dia, horaInicio).minusDays(1) : null,
+				cancelado ? "BARBERO" : null);
 	}
 
 }

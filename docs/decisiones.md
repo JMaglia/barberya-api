@@ -37,6 +37,9 @@ Registro de decisiones cerradas. Si algo cambia, se agrega una línea nueva con 
 - 2026-11-12: los proveedores pasan a V1 para tener historial de compras por proveedor, sin tablas de productos
   ni detalle de compra: el gasto guarda proveedor y cantidad (opcionales) y el precio unitario se calcula
   (`monto / cantidad`). Proveedores y categorías con gastos no se borran; los proveedores tienen baja lógica.
+- 2026-11-27: un turno solo se puede marcar como completado o "no vino" (`AUSENTE`) desde que empezó (inicio <= ahora).
+- 2026-11-27: revertir devuelve un turno `COMPLETADO` o `AUSENTE` a `CONFIRMADO`; si era `COMPLETADO`, se borra su cobro.
+  Un `AUSENTE` vuelve a ocupar su horario: si mientras tanto se reservó otro turno ahí, no se puede revertir.
 
 ## Notificaciones
 - MVP: mail de confirmación y recordatorio + botón que abre WhatsApp con el mensaje armado (wa.me).
