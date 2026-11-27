@@ -34,6 +34,7 @@ import com.barberya.auth.TokenRecuperacionInvalidoException;
 import com.barberya.auth.UsuarioActual;
 import com.barberya.barberia.SlugNoDisponibleException;
 import com.barberya.barberia.YaTieneBarberiaException;
+import com.barberya.gasto.ConflictoGastoException;
 import com.barberya.servicio.ServicioDuplicadoException;
 import com.barberya.turno.ConflictoTurnoException;
 import com.barberya.turno.FichaEnCursoException;
@@ -211,6 +212,11 @@ public class ManejadorErrores {
 		return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
 				.header(HttpHeaders.RETRY_AFTER, String.valueOf(segundos))
 				.body(problema);
+	}
+
+	@ExceptionHandler(ConflictoGastoException.class)
+	ProblemDetail conflictoGasto(ConflictoGastoException error) {
+		return problema(HttpStatus.CONFLICT, error.getTitulo(), error.getMessage());
 	}
 
 	private static ProblemDetail problema(HttpStatus estado, String titulo, String detalle) {
