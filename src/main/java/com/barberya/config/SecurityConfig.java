@@ -70,6 +70,7 @@ public class SecurityConfig {
 						.requestMatchers("/api/v1/barberia/**", "/api/v1/servicios/**", "/api/v1/horarios/**",
 								"/api/v1/bloqueos/**", "/api/v1/turnos/**", "/api/v1/agenda/**", "/api/v1/clientes/**")
 								.hasRole("DUENO")
+						.requestMatchers("/api/v1/proveedores/**", "/api/v1/categorias-gasto/**", "/api/v1/gastos/**").hasRole("DUENO")
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(o -> o
 						.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
