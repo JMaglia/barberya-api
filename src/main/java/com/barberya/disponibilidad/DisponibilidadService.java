@@ -98,6 +98,25 @@ public class DisponibilidadService {
 		return Optional.ofNullable(calcular(barberia, servicio, fecha, fecha, reloj.instant()).get(fecha).get(inicio));
 	}
 
+	/**
+	 * Para los turnos que carga el barbero, que no pasan por el cálculo de libres: si [inicio, fin) entra entero en una
+	 * franja de atención del miembro, con el mismo criterio que la calculadora.
+	 */
+	@Transactional(readOnly = true)
+	public boolean entraEnHorario(Barberia barberia, Long miembroId, Instant inicio, Instant fin) {
+		ZoneId zona = zona(barberia);
+		LocalDate fecha = LocalDate.ofInstant(inicio, zona);
+		return horarios.findByMiembroIdOrderByDiaSemanaAscHoraInicioAsc(miembroId).stream()
+				.map(DisponibilidadService::franja)
+				.anyMatch(f -> f.contiene(fecha, zona, inicio, fin));
+	}
+
+	/** Si [inicio, fin) se superpone con algún bloqueo del miembro. Contiguo no es superpuesto. */
+	@Transactional(readOnly = true)
+	public boolean pisaBloqueo(Long miembroId, Instant inicio, Instant fin) {
+		return !ocupaciones.bloqueosEnRango(Set.of(miembroId), inicio, fin).isEmpty();
+	}
+
 	/** Por día, cada inicio libre con el primer miembro (por id) que lo tiene libre. */
 	private Map<LocalDate, NavigableMap<Instant, MiembroBarberia>> calcular(Barberia barberia, Servicio servicio,
 			LocalDate desde, LocalDate hasta, Instant ahora) {
@@ -129,9 +148,7 @@ public class DisponibilidadService {
 		for (var entrada : franjasPorMiembro.entrySet()) {
 			Long miembroId = entrada.getKey();
 			MiembroBarberia miembro = entrada.getValue().getFirst().getMiembro();
-			List<FranjaSemanal> franjas = entrada.getValue().stream()
-					.map(h -> new FranjaSemanal(h.getDiaSemana(), h.getHoraInicio(), h.getHoraFin()))
-					.toList();
+			List<FranjaSemanal> franjas = entrada.getValue().stream().map(DisponibilidadService::franja).toList();
 			var parametros = new ParametrosDisponibilidad(zona, desde, hasta, franjas,
 					turnosPorMiembro.getOrDefault(miembroId, List.of()),
 					bloqueosPorMiembro.getOrDefault(miembroId, List.of()),
@@ -148,6 +165,10 @@ public class DisponibilidadService {
 	private static Map<Long, List<Intervalo>> agrupar(List<OcupacionMiembro> lista) {
 		return lista.stream().collect(Collectors.groupingBy(OcupacionMiembro::miembroId,
 				Collectors.mapping(OcupacionMiembro::intervalo, Collectors.toList())));
+	}
+
+	private static FranjaSemanal franja(HorarioAtencion h) {
+		return new FranjaSemanal(h.getDiaSemana(), h.getHoraInicio(), h.getHoraFin());
 	}
 
 	private static ZoneId zona(Barberia barberia) {
