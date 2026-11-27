@@ -123,7 +123,7 @@ public class TurnoService {
 	/** El barbero cancela un turno de su barbería que todavía no empezó, sin límite de horas. */
 	@Transactional
 	public TurnoClienteResponse cancelarComoBarbero(Long barberiaId, Long turnoId) {
-		Turno turno = turnos.findParaCancelarDeBarberia(turnoId, barberiaId)
+		Turno turno = turnos.findParaModificarDeBarberia(turnoId, barberiaId)
 				.orElseThrow(() -> new RecursoNoEncontradoException("No encontramos ese turno"));
 		if (turno.getEstado() != EstadoTurno.CONFIRMADO) {
 			throw ConflictoTurnoException.noCancelable();

@@ -1,6 +1,7 @@
 package com.barberya.turno;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -66,6 +67,34 @@ public interface TurnoRepository extends JpaRepository<Turno, Long> {
 	/** Turno de esa barbería, bloqueado hasta el fin de la transacción. */
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	@Query("SELECT t FROM Turno t WHERE t.id = :id AND t.barberia.id = :barberiaId")
-	Optional<Turno> findParaCancelarDeBarberia(@Param("id") Long id, @Param("barberiaId") Long barberiaId);
+	Optional<Turno> findParaModificarDeBarberia(@Param("id") Long id, @Param("barberiaId") Long barberiaId);
+
+	/**
+	 * Agenda de un miembro: turnos que empiezan en [desde, hasta), con servicio y cliente (sin N+1). Los cancelados
+	 * solo si se piden.
+	 */
+	@Query("""
+			SELECT t FROM Turno t JOIN FETCH t.servicio JOIN FETCH t.cliente
+			WHERE t.barberia.id = :barberiaId AND t.miembro.id = :miembroId
+			  AND t.inicio >= :desde AND t.inicio < :hasta
+			  AND (:incluirCancelados = true OR t.estado <> com.barberya.turno.EstadoTurno.CANCELADO)
+			ORDER BY t.inicio ASC, t.id ASC
+			""")
+	List<Turno> buscarAgenda(@Param("barberiaId") Long barberiaId, @Param("miembroId") Long miembroId,
+			@Param("desde") Instant desde, @Param("hasta") Instant hasta,
+			@Param("incluirCancelados") boolean incluirCancelados);
+
+	/**
+	 * Si otro turno del miembro que ocupa horario (no CANCELADO ni AUSENTE, igual que turnos_sin_superposicion) se pisa
+	 * con [inicio, fin). Los contiguos no cuentan.
+	 */
+	@Query("""
+			SELECT count(t) > 0 FROM Turno t
+			WHERE t.miembro.id = :miembroId AND t.id <> :excluirId
+			  AND t.estado NOT IN (com.barberya.turno.EstadoTurno.CANCELADO, com.barberya.turno.EstadoTurno.AUSENTE)
+			  AND t.inicio < :fin AND t.fin > :inicio
+			""")
+	boolean existeSuperpuesto(@Param("miembroId") Long miembroId, @Param("inicio") Instant inicio,
+			@Param("fin") Instant fin, @Param("excluirId") Long excluirId);
 
 }

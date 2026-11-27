@@ -68,7 +68,7 @@ public class SecurityConfig {
 						.requestMatchers("/api/v1/barberias/*/turnos", "/api/v1/mis-turnos/**").authenticated()
 						// La barbería del token y sus datos: solo el dueño. POST /barberias (onboarding) no exige rol.
 						.requestMatchers("/api/v1/barberia/**", "/api/v1/servicios/**", "/api/v1/horarios/**",
-								"/api/v1/bloqueos/**", "/api/v1/turnos/**").hasRole("DUENO")
+								"/api/v1/bloqueos/**", "/api/v1/turnos/**", "/api/v1/agenda/**").hasRole("DUENO")
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(o -> o
 						.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
